@@ -1,10 +1,8 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-
-export default function Home() {
+import ThreeItemGrid from "@/components/grid/three-items";
+export default function HomePage() {
   return (
-    <div className={styles.page}>
-        next js - ecommerce
+    <div className=''>
+      <ThreeItemGrid/>
     </div>
   );
 }
