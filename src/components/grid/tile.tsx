@@ -2,16 +2,15 @@ import Label from "@/label";
 import Image from "next/image";
 
 export default function GridTileImage(props: any) {
-  const { src, alt, sizes, label, fill } = props;
+  const { src, alt, label } = props;
 
   return (
-    <div className="group flex justify-center items-center overflow-hidden h-full w-full border rounded-lg hover:border-blue-600 bg-white">
+    <div className="group border rounded-lg hover:border-blue-600 bg-white h-full w-full">
       <Image
         src={src}
         alt={alt}
-        fill={fill}
-        sizes={sizes}
-        className="relative h-full w-full object-contain transition duration-300 ease-in-out group-hover:scale-105"
+        fill
+        className="transition object-contain duration-300 ease-in-out group-hover:scale-105"
       />
       <Label
         title={label.title}
