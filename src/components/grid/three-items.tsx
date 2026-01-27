@@ -1,5 +1,8 @@
 import Link from "next/link";
 import GridTileImage from "./tile";
+import { firstProduct, secondProduct, thirdProduct } from "@/data";
+
+
 function ThreeItemGridItem(props: { item: any; size: "full" | "half" }) {
   const { size, item } = props;
   return (
@@ -8,7 +11,7 @@ function ThreeItemGridItem(props: { item: any; size: "full" | "half" }) {
         size === "full" ? "col-span-4 row-span-2" : "col-span-2 row-span-1"
       }
     >
-      <Link href="" className="relative aspect-square block h-full w-full">
+      <Link href="" className="aspect-square block h-full w-full">
         <GridTileImage
           src={item.featuredImage.url}
           alt={item.title}
@@ -24,44 +27,6 @@ function ThreeItemGridItem(props: { item: any; size: "full" | "half" }) {
   );
 }
 
-const firstProduct = {
-  featuredImage: {
-    url: "/images/t-shirt-1.avif",
-  },
-  title: "Acme Circles T-Shirt",
-  priceRange: {
-    maxVariantPrice: {
-      amount: "20",
-      currencyCode: "USD",
-    },
-  },
-};
-
-const secondProduct = {
-  featuredImage: {
-    url: "/images/bag-1-dark.avif",
-  },
-  title: "Acme Drawstring Bag",
-  priceRange: {
-    maxVariantPrice: {
-      amount: "12",
-      currencyCode: "USD",
-    },
-  },
-};
-
-const thirdProduct = {
-  featuredImage: {
-    url: "/images/cup-black.avif",
-  },
-  title: "Acme Cup",
-  priceRange: {
-    maxVariantPrice: {
-      amount: "15",
-      currencyCode: "USD",
-    },
-  },
-};
 
 export default function ThreeItemGrid() {
   return (

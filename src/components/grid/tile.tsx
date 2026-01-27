@@ -5,7 +5,7 @@ export default function GridTileImage(props: any) {
   const { src, alt, label } = props;
 
   return (
-    <div className="group border rounded-lg hover:border-blue-600 bg-white h-full w-full">
+    <div className="relative group border rounded-lg hover:border-blue-600 bg-white h-full w-full overflow-hidden">
       <Image
         src={src}
         alt={alt}

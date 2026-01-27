@@ -24,7 +24,7 @@ export default function NavBar() {
             {menu.map((item) => (
               <li key={item.title}>
                 <Link
-                  href=""
+                  href={item.path}
                   className="text-neutral-500 hover:text-black hover:underline"
                 >
                   {item.title}
