@@ -10,7 +10,7 @@ export default function SearchPage() {
           key={`item.title-${i}`}
           className="max-w-[30vw]"
         >
-          <Link href="" className="aspect-square block w-full h-full">
+          <Link href="/product/1" className="aspect-square block w-full h-full">
             <GridTileImage
               src={item.url}
               fill

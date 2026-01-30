@@ -302,7 +302,7 @@ export const allData = [
       },
     },
   },
-   {
+  {
     url: "/images/baby-onesie-beige-1.avif",
     title: "Acme Baby Onesie",
     priceRange: {
@@ -323,7 +323,7 @@ export const allData = [
     },
   },
 
-   {
+  {
     url: "/images/mug-1.avif",
     title: "Acme Mug",
     priceRange: {
@@ -333,7 +333,7 @@ export const allData = [
       },
     },
   },
-   {
+  {
     url: "/images/keyboard.avif",
     title: "Acme Keyboard",
     priceRange: {
@@ -396,7 +396,7 @@ export const allData = [
     },
   },
 
-   {
+  {
     url: "/images/dog-sweater-1.avif",
     title: "Acme Dog Sweater",
     priceRange: {
@@ -407,7 +407,7 @@ export const allData = [
     },
   },
 
-   {
+  {
     url: "/images/cup-black.avif",
     title: "Acme Cup",
     priceRange: {
@@ -417,7 +417,7 @@ export const allData = [
       },
     },
   },
-    {
+  {
     url: "/images/bomber-jacket-army.avif",
     title: "Acme Bomber Jacket",
     priceRange: {
@@ -427,7 +427,7 @@ export const allData = [
       },
     },
   },
-   {
+  {
     url: "/images/baby-cap-black.avif",
     title: "Acme Baby Cap",
     priceRange: {
@@ -459,3 +459,20 @@ export const allData = [
   },
 ];
 
+export const galleryImages = [
+  {
+    url: "/images/baby-onesie-beige-1.avif",
+  },
+  {
+    url: "/images/baby-onesie-beige-2.avif",
+  },
+  {
+    url: "/images/baby-onesie-black-1.avif",
+  },
+  {
+    url: "/images/baby-onesie-black-1.avif",
+  },
+  {
+    url: "/images/baby-onesie-white-1.avif",
+  },
+];

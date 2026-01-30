@@ -1,5 +1,6 @@
 import Collections from "@/components/layout/search/collections";
 import SortBy from "@/components/layout/search/sort";
+import WrapperContent from "@/components/layout/wrapper-content";
 import Image from "next/image";
 
 export default function SearchLayout({
@@ -8,8 +9,8 @@ export default function SearchLayout({
   children: React.ReactNode;
 }) {
   return (
-    <>
-      <div className="mx-auto max-w-(--breakpoint-2xl) flex flex-row px-4 pb-4 text-black gap-8">
+    <WrapperContent>
+      <div className="flex flex-row pb-4 text-black gap-8">
         <div className="min-w-[125px]">
           <Collections />
         </div>
@@ -18,6 +19,6 @@ export default function SearchLayout({
           <SortBy />
         </div>
       </div>
-    </>
+    </WrapperContent>
   );
 }

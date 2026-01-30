@@ -1,7 +1,7 @@
 import Link from "next/link";
 import GridTileImage from "./tile";
 import { firstProduct, secondProduct, thirdProduct } from "@/data";
-
+import WrapperContent from "@/components/layout/wrapper-content";
 
 function ThreeItemGridItem(props: { item: any; size: "full" | "half" }) {
   const { size, item } = props;
@@ -27,14 +27,14 @@ function ThreeItemGridItem(props: { item: any; size: "full" | "half" }) {
   );
 }
 
-
 export default function ThreeItemGrid() {
   return (
-    <section className="mx-auto max-w-(--breakpoint-2xl) px-4 pb-4 grid gap-4 grid-cols-6 grid-rows-2 max-h-[calc(100vh-200px)]">
-      <ThreeItemGridItem size="full" item={firstProduct} />
-       <ThreeItemGridItem size="half" item={secondProduct} />
-      <ThreeItemGridItem size="half" item={thirdProduct} /> 
-    </section>
+    <WrapperContent>
+      <section className="pb-4 grid gap-4 grid-cols-6 grid-rows-2 max-h-[calc(100vh-200px)]">
+        <ThreeItemGridItem size="full" item={firstProduct} />
+        <ThreeItemGridItem size="half" item={secondProduct} />
+        <ThreeItemGridItem size="half" item={thirdProduct} />
+      </section>
+    </WrapperContent>
   );
 }
-
