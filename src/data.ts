@@ -470,7 +470,7 @@ export const galleryImages = [
     url: "/images/baby-onesie-black-1.avif",
   },
   {
-    url: "/images/baby-onesie-black-1.avif",
+    url: "/images/baby-onesie-black-2.avif",
   },
   {
     url: "/images/baby-onesie-white-1.avif",

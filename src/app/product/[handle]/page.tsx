@@ -1,11 +1,22 @@
+"use client";
 import WrapperContent from "@/components/layout/wrapper-content";
 import Price from "@/components/price";
 import VariantSelector from "@/components/product/variant-selector";
+import Prose from "@/components/prose";
 import { galleryImages } from "@/data";
-import { ArrowLeftIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  PlusIcon,
+} from "@heroicons/react/24/outline";
 import Image from "next/image";
+import { useState } from "react";
 
 export default function Product() {
+  const [currentUrlImage, setCurrentImage] = useState(
+    "/images/baby-onesie-beige-1.avif",
+  );
+  console.log('currentUrlImage',currentUrlImage)
   return (
     <WrapperContent>
       <div className="grid grid-rows-[1fr_auto]">
@@ -14,7 +25,7 @@ export default function Product() {
             <div className="relative w-full max-h-[550px]">
               <div className="relative w-full aspect-square max-h-[550px]">
                 <Image
-                  src="/images/baby-onesie-beige-1.avif"
+                  src={currentUrlImage}
                   fill
                   alt=""
                   className="object-contain object-center"
@@ -38,7 +49,10 @@ export default function Product() {
                 {galleryImages.map((image, index) => (
                   <li key={`${image}-${index}`} className="">
                     <button
-                      className={`w-20 h-20 ${image.url === "/images/baby-onesie-beige-1.avif" ? "border-2 border-blue-600" : "border"} rounded-xl overflow-hidden transition-all ease-in-out duration-200 hover:border-blue-600`}
+                      className={`w-20 h-20 ${image.url === currentUrlImage ? "border-2 border-blue-600" : "border"} rounded-xl overflow-hidden transition-all ease-in-out duration-200 hover:border-blue-600`}
+                      onClick={() => {
+                        setCurrentImage(image.url);
+                      }}
                     >
                       <div className="group relative h-full w-full">
                         <Image
@@ -67,7 +81,6 @@ export default function Product() {
                 />
               </div>
             </div>
-
             <VariantSelector
               data={[
                 {
@@ -81,16 +94,20 @@ export default function Product() {
               ]}
             />
 
-            <div></div>
-            <div></div>
+            <Prose
+              className="mb-6 text-sm leading-tight"
+              html={
+                "<span>Short sleeve 5-oz, 100% combed ringspun cotton onesie</span>"
+              }
+            />
+            <button className="relative bg-blue-600 w-full rounded-full flex justify-center items-center py-4 text-white font-semibold transition duration-100 ease-in-out hover:opacity-90">
+              <span>Add To Cart</span>
+              <PlusIcon className="h-5 absolute top-1/2 transform -translate-y-1/2 left-5" />
+            </button>
           </div>
         </div>
 
         <div className="h-[200px]">bottom</div>
-      </div>
-      <div className="flex">
-        <div>child-1</div>
-        <div>child-2</div>
       </div>
     </WrapperContent>
   );
