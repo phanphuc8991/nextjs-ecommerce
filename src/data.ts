@@ -459,20 +459,20 @@ export const allData = [
   },
 ];
 
-export const galleryImages = [
-  {
+export const galleryImages: Record<string,{url: string}> = {
+  "0": {
     url: "/images/baby-onesie-beige-1.avif",
   },
-  {
+  "1": {
     url: "/images/baby-onesie-beige-2.avif",
   },
-  {
+  "2": {
     url: "/images/baby-onesie-black-1.avif",
   },
-  {
+  "3": {
     url: "/images/baby-onesie-black-2.avif",
   },
-  {
+  "4": {
     url: "/images/baby-onesie-white-1.avif",
   },
-];
+};

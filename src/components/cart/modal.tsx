@@ -1,10 +1,8 @@
 "use client";
 import OpenCart from "./open-cart";
 import {
-  Description,
   Dialog,
   DialogPanel,
-  DialogTitle,
   DialogBackdrop,
 } from "@headlessui/react";
 import { useState } from "react";
