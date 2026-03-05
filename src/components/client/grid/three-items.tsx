@@ -1,7 +1,8 @@
 import Link from "next/link";
 import GridTileImage from "./tile";
 import { firstProduct, secondProduct, thirdProduct } from "@/data";
-import WrapperContent from "@/components/layout/wrapper-content";
+import WrapperContent from "@/components/client/layout/wrapper-content";
+
 
 function ThreeItemGridItem(props: { item: any; size: "full" | "half" }) {
   const { size, item } = props;

@@ -1,4 +1,4 @@
-import Label from "@/label";
+import Label from "@/components/client/label";
 import Image from "next/image";
 
 export default function GridTileImage(props: any) {

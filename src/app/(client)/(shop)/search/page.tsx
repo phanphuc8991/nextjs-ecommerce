@@ -1,4 +1,4 @@
-import GridTileImage from "@/components/grid/tile";
+import GridTileImage from "@/components/client/grid/tile";
 import { allData } from "@/data";
 import Link from "next/link";
 

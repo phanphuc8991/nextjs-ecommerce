@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import Price from "./components/price";
+import Price from "./price";
 
 export default function Label(props: {
   title: string;

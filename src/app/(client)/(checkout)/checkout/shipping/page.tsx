@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Field, Radio, RadioGroup } from "@headlessui/react";
 import { useState } from "react";
 import { describe } from "node:test";
-import Price from "@/components/price";
+import Price from "@/components/client/price";
 
 const plans = [
   {

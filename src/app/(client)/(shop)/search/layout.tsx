@@ -1,7 +1,7 @@
-import Collections from "@/components/layout/search/collections";
-import SortBy from "@/components/layout/search/sort";
-import WrapperContent from "@/components/layout/wrapper-content";
-import Image from "next/image";
+import Collections from "@/components/client/layout/search/collections";
+import SortBy from "@/components/client/layout/search/sort";
+import WrapperContent from "@/components/client/layout/wrapper-content";
+
 
 export default function SearchLayout({
   children,

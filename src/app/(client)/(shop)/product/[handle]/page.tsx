@@ -1,8 +1,7 @@
 "use client";
-import WrapperContent from "@/components/layout/wrapper-content";
-import Price from "@/components/price";
-import VariantSelector from "@/components/product/variant-selector";
-import Prose from "@/components/prose";
+import Price from "@/components/client/price";
+import VariantSelector from "@/components/client/product/variant-selector";
+import Prose from "@/components/client/prose";
 import { carouselProducts, galleryImages } from "@/data";
 import {
   ArrowLeftIcon,
@@ -12,7 +11,8 @@ import {
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import GridTileImage from "@/components/grid/tile";
+import GridTileImage from "@/components/client/grid/tile";
+import WrapperContent from "@/components/client/layout/wrapper-content";
 
 export default function Product() {
   const searchParams = useSearchParams();

@@ -1,10 +1,11 @@
 "use client";
-import LogoSquare from "@/components/logo-square";
-import Price from "@/components/price";
+
+import Price from "@/components/client/price";
 import Image from "next/image";
 import Link from "next/link";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { usePathname } from "next/navigation";
+import LogoSquare from "@/components/client/logo-square";
 const list = [
   "/images/baby-onesie-beige-1.avif",
   "/images/baby-onesie-beige-1.avif",
