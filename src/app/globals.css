@@ -21,10 +21,10 @@
   outline: none;
 }
 
-a,
+/* a,
 input,select {
   @apply border-[#333333] focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-blue-500;
-}
+} */
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
