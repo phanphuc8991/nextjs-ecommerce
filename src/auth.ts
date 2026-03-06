@@ -13,6 +13,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         password: {},
       },
       authorize: async (credentials) => {
+        console.log('check.....',credentials)
         let user = null
  
        
@@ -20,7 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if (!user) {
           // No user found, so this is their first attempt to login
           // Optionally, this is also the place you could do a user registration
-          throw new Error("Invalid credentials.")
+           throw new Error("Invalid credentials.")
         }
  
         // return user object with their profile data

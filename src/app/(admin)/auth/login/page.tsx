@@ -1,5 +1,5 @@
 "use client";
-
+import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -22,9 +22,11 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { authenticate } from "@/utils/actions";
+import router from "next/router";
 
 const formSchema = z.object({
-  username: z
+  email: z
     .string()
     .min(3, "Username must be at least 3 characters.")
     .max(10, "Username must be at most 10 characters.")
@@ -46,26 +48,32 @@ export default function FormRhfInput() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      email: "",
     },
   });
 
-  function onSubmit(data: z.infer<typeof formSchema>) {
-    toast("You submitted the following values:", {
-      description: (
-        <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-          <code>{JSON.stringify(data, null, 2)}</code>
-        </pre>
-      ),
-      position: "bottom-right",
-      classNames: {
-        content: "flex flex-col gap-2",
-      },
-      style: {
-        "--border-radius": "calc(var(--radius)  + 4px)",
-      } as React.CSSProperties,
-    });
-    console.log('data',data);
+  async function onSubmit(data: z.infer<typeof formSchema>) {
+    const { email, password } = data;
+    try {
+      const res = await authenticate(email, password);
+      // if (res.error) {
+      //   toast(res.message, {
+      //     position: "top-right",
+      //     classNames: {
+      //       content: "flex flex-col gap-2",
+      //     },
+      //     style: {
+      //       "--border-radius": "calc(var(--radius)  + 4px)",
+      //     } as React.CSSProperties,
+      //   });
+      //   if (res.code === 2) {
+      //   }
+      // } else {
+      //   router.push("/dashboard");
+      // }
+    } catch (error) {
+      console.log("error1", error);
+    }
   }
 
   return (
@@ -80,19 +88,17 @@ export default function FormRhfInput() {
         <form id="form-rhf-input" onSubmit={form.handleSubmit(onSubmit)}>
           <FieldGroup>
             <Controller
-              name="username"
+              name="email"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="form-rhf-input-username">
-                    Username
-                  </FieldLabel>
+                  <FieldLabel htmlFor="form-rhf-input-email">Email</FieldLabel>
                   <Input
                     {...field}
-                    id="form-rhf-input-username"
+                    id="form-rhf-input-email"
                     aria-invalid={fieldState.invalid}
                     placeholder="shadcn"
-                    autoComplete="username"
+                    autoComplete="email"
                   />
 
                   {fieldState.invalid && (
