@@ -10,6 +10,7 @@ export async function authenticate(email: string, password: string) {
     });
     return r;
   } catch (error) {
+    console.log('error',error);
     if ((error as any).name === "InvalidEmailPasswordError") {
       return {
         error: (error as any).type,

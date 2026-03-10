@@ -26,14 +26,13 @@ import { authenticate } from "@/utils/actions";
 import router from "next/router";
 
 const formSchema = z.object({
-  email: z
-    .string()
-    .min(3, "Username must be at least 3 characters.")
-    .max(10, "Username must be at most 10 characters.")
-    .regex(
-      /^[a-zA-Z0-9_]+$/,
-      "Username can only contain letters, numbers, and underscores.",
-    ),
+  email: z.string(),
+  // .min(3, "Username must be at least 3 characters.")
+  // .max(20, "Username must be at most 10 characters."),
+  // .regex(
+  //   /^[a-zA-Z0-9_]+$/,
+  //   "Username can only contain letters, numbers, and underscores.",
+  // ),
   password: z
     .string()
     .min(3, "Username must be at least 3 characters.")
@@ -52,28 +51,13 @@ export default function FormRhfInput() {
     },
   });
 
-  async function onSubmit(data: z.infer<typeof formSchema>) {
-    const { email, password } = data;
-    try {
-      const res = await authenticate(email, password);
-      // if (res.error) {
-      //   toast(res.message, {
-      //     position: "top-right",
-      //     classNames: {
-      //       content: "flex flex-col gap-2",
-      //     },
-      //     style: {
-      //       "--border-radius": "calc(var(--radius)  + 4px)",
-      //     } as React.CSSProperties,
-      //   });
-      //   if (res.code === 2) {
-      //   }
-      // } else {
-      //   router.push("/dashboard");
-      // }
-    } catch (error) {
-      console.log("error1", error);
-    }
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    // console.log('values',values);
+    const { email, password } = values;
+
+      const data  = await authenticate(email,password)
+      console.log('data',data);
+
   }
 
   return (
