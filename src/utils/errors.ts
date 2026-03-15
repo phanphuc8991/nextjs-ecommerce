@@ -1,15 +1,5 @@
-import { AuthError } from "next-auth";
-
-
-
-export class InvalidEmailPasswordError extends AuthError {
-  static type = "Invalid Email Or Password"
-}
-
-export class InActiveAccountError extends AuthError {
-  static type = "Inactive Account Error"
-}
-
-export class InternalServerError extends AuthError {
-  static type = "Internal Server Error"
-}
+export const AUTH_ERROR_MESSAGES: Record<string, string> = {
+  UNAUTHORIZED: "The email or password you entered is incorrect.",
+  ACCOUNT_INACTIVE:
+    "Your account is inactive. Please activate your account or contact support.",
+};

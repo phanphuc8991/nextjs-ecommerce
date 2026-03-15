@@ -1,31 +1,23 @@
 "use server";
 import { signIn } from "@/auth";
+import { AUTH_ERROR_MESSAGES } from "./errors";
 
 export async function authenticate(email: string, password: string) {
   try {
-    const r = await signIn("credentials", {
+    const data = await signIn("credentials", {
       email: email,
       password: password,
       redirect: false,
     });
-    return r;
-  } catch (error) {
-    console.log('error',error);
-    if ((error as any).name === "InvalidEmailPasswordError") {
-      return {
-        error: (error as any).type,
-        code: 1,
-      };
-    } else if ((error as any).type === "InActiveAccountError") {
-      return {
-        error: (error as any).type,
-        code: 2,
-      };
-    } else {
-      return {
-        error: (error as any).type,
-        code: 3,
-      };
-    }
+    return { success: true, data };
+  } catch (err: any) {
+    const errorCode = err?.error;
+    return {
+      success: false,
+      code: errorCode,
+      message:
+        AUTH_ERROR_MESSAGES[errorCode] ??
+        "Something went wrong. Please try again.",
+    };
   }
 }

@@ -6,7 +6,7 @@
 
 @plugin "tailwindcss-animate";
 
-@layer base {
+ @layer base {
   *,
   ::after,
   ::before,
@@ -14,17 +14,31 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
-}
+} 
 
 /* Remove the default outline */
 *:focus-visible {
   outline: none;
-}
+} 
 
 /* a,
 input,select {
   @apply border-[#333333] focus-visible:border-transparent focus-visible:ring-2 focus-visible:ring-blue-500;
 } */
+
+
+.form-error-enter {
+  max-height: 0;
+  opacity: 0;
+  transition: all 1s ease-out;
+  overflow: hidden;
+}
+
+.form-error-show {
+  max-height: 100px; /* Đủ cho 2-3 dòng chữ */
+  opacity: 1;
+  margin-bottom: 1rem;
+}
 
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
