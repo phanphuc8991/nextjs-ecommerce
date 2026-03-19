@@ -21,22 +21,34 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { authenticate } from "@/utils/actions";
 import { useRouter } from "next/navigation";
-
-
+import Link from "next/link";
+import { routes } from "@/routes";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { useState } from "react";
 
 const loginSchema = z.object({
   email: z
     .email("Please enter a valid email")
     .trim()
     .min(1, "Please enter your email"),
-  password: z.string().trim().min(1, "Please enter your password"),
+  password: z
+    .string()
+    .trim()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(
+      /[^A-Za-z0-9]/,
+      "Password must contain at least one special character",
+    ),
 });
 
 type LoginValues = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
-
+  const [showPassword, setShowPassword] = useState(false);
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -54,9 +66,9 @@ export default function LoginForm() {
   } = form;
 
   async function onSubmit(values: LoginValues) {
+    clearErrors("root");
     try {
       const data = await authenticate(values.email, values.password);
-      console.log('data',data);
       if (!data.success) {
         setError("root", {
           type: "manual",
@@ -68,7 +80,7 @@ export default function LoginForm() {
     } catch (error) {
       setError("root", {
         type: "manual",
-        message:  "Something went wrong. Please try again.",
+        message: "Something went wrong. Please try again.",
       });
     }
   }
@@ -83,15 +95,12 @@ export default function LoginForm() {
               Login with your Apple or Google account
             </CardDescription>
           </CardHeader>
-
-          {/* LỚP PHỦ LỖI (OVERLAY ERROR) */}
           {errors.root && (
             <div className="absolute inset-0 z-10 flex items-center justify-center bg-card px-6 animate-in fade-in zoom-in-95 duration-200">
               <div className="w-full rounded-lg bg-destructive/10 p-3 border border-destructive/20 flex items-center justify-between gap-2">
                 <p className="text-sm font-medium text-destructive text-center w-full">
                   {errors.root.message}
                 </p>
-                {/* Nút X để xóa lỗi nhanh nếu muốn */}
                 <button
                   type="button"
                   onClick={() => clearErrors("root")}
@@ -164,18 +173,29 @@ export default function LoginForm() {
                         Forgot your password?
                       </a>
                     </div>
-
-                    <Input
-                      {...field}
-                      type="password"
-                      autoComplete="password"
-                      aria-invalid={fieldState.invalid}
-                      onChange={(e) => {
-                        field.onChange(e);
-                        clearErrors("root");
-                      }}
-                    />
-
+                    <div className="relative">
+                      <Input
+                        {...field}
+                        type={showPassword ? "text" : "password"}
+                        autoComplete="password"
+                        aria-invalid={fieldState.invalid}
+                        onChange={(e) => {
+                          field.onChange(e);
+                          clearErrors("root");
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
+                      >
+                        {showPassword ? (
+                          <EyeSlashIcon className="h-5 w-5" />
+                        ) : (
+                          <EyeIcon className="h-5 w-5" />
+                        )}
+                      </button>
+                    </div>
                     {fieldState.error && (
                       <FieldError errors={[fieldState.error]} />
                     )}
@@ -183,13 +203,15 @@ export default function LoginForm() {
                 )}
               />
             </FieldGroup>
+
             <Field>
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting ? "Logging in..." : "Login"}
               </Button>
 
               <FieldDescription className="text-center mt-3">
-                Don&apos;t have an account? <a href="#">Sign up</a>
+                Don&apos;t have an account?{" "}
+                <Link href={routes.signup}>Sign up</Link>
               </FieldDescription>
             </Field>
           </form>

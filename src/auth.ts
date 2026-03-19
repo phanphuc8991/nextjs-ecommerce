@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import { sendRequest } from "./utils/api";
 import { IUser } from "./types/next-auth";
 import { AdapterUser } from "next-auth/adapters";
+import { loginUser } from "@/services/auth.service";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -13,13 +14,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       authorize: async (credentials): Promise<any> => {
         try {
-          const res = await sendRequest<IBackendRes<ILogin>>({
-            method: "POST",
-            url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`,
-            body: {
-              username: credentials.email,
-              password: credentials.password,
-            },
+          const res = await loginUser({
+            username: credentials.email,
+            password: credentials.password,
           });
           return res;
         } catch (err: any) {

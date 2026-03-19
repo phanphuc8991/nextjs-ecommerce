@@ -1,36 +1,40 @@
 "use client";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
-import { toast } from "sonner";
-import * as z from "zod";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardFooter,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Field, FieldGroup } from "@/components/ui/field";
+
 import {
-  Field,
-  FieldError,
-  FieldGroup,
-  FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { sendRequest } from "@/utils/api";
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { sendRequest } from "@/utils/api";
 
 const formSchema = z.object({
   _id: z.string(),
-  code: z.string(),
+  code: z.string().min(6, "Code must be 6 digits"),
 });
 
-export default function RegisterPage(props: any) {
-  const { _id } = props;
+type FormValues = z.infer<typeof formSchema>;
 
+export default function VerifyForm(props: any) {
+  const { _id, email } = props;
   const router = useRouter();
-  const form = useForm<z.infer<typeof formSchema>>({
+
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       _id,
@@ -38,94 +42,98 @@ export default function RegisterPage(props: any) {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-    const { _id, code } = values;
+  const {
+    control,
+    handleSubmit,
+    formState: { isSubmitting },
+  } = form;
 
+  async function onSubmit(values: FormValues) {
     const res = await sendRequest<IBackendRes<ILogin>>({
       url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/check-code`,
       method: "POST",
       body: {
-        _id,
-        code,
+        _id: values._id,
+        code: values.code,
       },
     });
+
     if (res?.data) {
-      toast.success("Active account successfull", { position: "top-right" });
       router.push(`/auth/login`);
     } else {
-      toast.error(res.message, { position: "top-right" });
+      // TODO: show error
     }
-    console.log('res',res);
   }
 
   return (
-    <>
+    <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
       <Card className="w-full sm:max-w-md">
-        <CardHeader>
-          <CardTitle>Verify</CardTitle>
+        <CardHeader className="text-center">
+          <CardTitle>Enter Verification Code</CardTitle>
+          <CardDescription>We've sent a code to {email}</CardDescription>
         </CardHeader>
-        <CardContent>
-          <form id="form-rhf-input" onSubmit={form.handleSubmit(onSubmit)}>
-            <FieldGroup>
-              <Controller
-                name="_id"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel hidden htmlFor="form-rhf-input-_id">
-                      Id
-                    </FieldLabel>
-                    <Input
-                      {...field}
-                      id="form-rhf-input-_id"
-                      aria-invalid={fieldState.invalid}
-                      placeholder={_id}
-                      autoComplete="_id"
-                      disabled
-                      hidden
-                    />
 
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
+        <CardContent>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {/* hidden _id */}
+            <input type="hidden" value={_id} />
+
+            {/* OTP */}
+
+            <FieldGroup className="mb-6">
+              <div className="flex justify-center">
+                <Controller
+                  name="code"
+                  control={control}
+                  render={({ field }) => (
+                    <InputOTP
+                      maxLength={6}
+                      value={field.value}
+                      onChange={(value) => {
+                        const onlyNums = value.replace(/[^0-9]/g, "");
+                        field.onChange(onlyNums);
+                      }}
+                      inputMode="numeric"
+                    >
+                      <InputOTPGroup>
+                        <InputOTPSlot index={0} />
+                        <InputOTPSlot index={1} />
+                      </InputOTPGroup>
+
+                      <InputOTPSeparator />
+
+                      <InputOTPGroup>
+                        <InputOTPSlot index={2} />
+                        <InputOTPSlot index={3} />
+                      </InputOTPGroup>
+
+                      <InputOTPSeparator />
+
+                      <InputOTPGroup>
+                        <InputOTPSlot index={4} />
+                        <InputOTPSlot index={5} />
+                      </InputOTPGroup>
+                    </InputOTP>
+                  )}
+                />
+              </div>
             </FieldGroup>
 
+            {/* Submit */}
             <FieldGroup>
-              <Controller
-                name="code"
-                control={form.control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="form-rhf-input-code">Code</FieldLabel>
-                    <Input
-                      {...field}
-                      id="form-rhf-input-code"
-                      aria-invalid={fieldState.invalid}
-                      placeholder=""
-                      autoComplete="code"
-                    />
-
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
+              <Field>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "Verifying..." : "Verify"}
+                </Button>
+              </Field>
             </FieldGroup>
           </form>
         </CardContent>
-        <CardFooter>
-          <Field orientation="horizontal">
-            <Button type="submit" form="form-rhf-input">
-              Submit
-            </Button>
-          </Field>
-        </CardFooter>
       </Card>
-    </>
+    </div>
   );
 }

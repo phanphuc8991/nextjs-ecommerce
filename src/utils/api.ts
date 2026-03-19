@@ -43,6 +43,5 @@ export const sendRequest = async <T>(props: IRequest): Promise<T> => {
       error: data?.error ?? "UNKNOWN_ERROR",
     };
   }
-  console.log('data',data);
   return data as T;
 };
