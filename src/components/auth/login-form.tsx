@@ -25,6 +25,8 @@ import Link from "next/link";
 import { routes } from "@/routes";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
+import ResendEmailModal from "./resend-email-modal";
+
 
 const loginSchema = z.object({
   email: z
@@ -86,7 +88,10 @@ export default function LoginForm() {
   }
 
   return (
+    <>
+        <ResendEmailModal/>
     <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
+   
       <Card className="w-full sm:max-w-md">
         <div className="relative">
           <CardHeader className="text-center">
@@ -223,5 +228,6 @@ export default function LoginForm() {
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
+    </>
   );
 }
