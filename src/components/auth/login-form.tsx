@@ -89,7 +89,8 @@ export default function LoginForm() {
 
   return (
     <>
-        <ResendEmailModal/>
+    <div className='w-[500px]'> <ResendEmailModal/> </div>
+       
     <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
    
       <Card className="w-full sm:max-w-md">
