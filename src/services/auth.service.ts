@@ -12,10 +12,15 @@ export const registerUser = async (payload: {
   });
 };
 
-export const loginUser = async (payload: {
-  username: any;
-  password: any;
-}) => {
+export const resendActivation = async (payload: { email: string }) => {
+  return sendRequest<IBackendRes<ILogin>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/resend-activation`,
+    method: "POST",
+    body: payload,
+  });
+};
+
+export const loginUser = async (payload: { username: any; password: any }) => {
   return sendRequest<IBackendRes<ILogin>>({
     method: "POST",
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`,

@@ -26,6 +26,7 @@ import { routes } from "@/routes";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import ResendEmailModal from "./resend-email-modal";
+import { AUTH_ERROR_MESSAGES } from "@/utils/errors";
 
 const loginSchema = z.object({
   email: z
@@ -50,6 +51,7 @@ type LoginValues = z.infer<typeof loginSchema>;
 export default function LoginForm() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<LoginValues>({
@@ -72,16 +74,14 @@ export default function LoginForm() {
     clearErrors("root");
     try {
       const data = await authenticate(values.email, values.password);
-      console.log("data", data);
       if (!data.success) {
         setError("root", {
           type: "manual",
-          message: data.message,
+          message: data.code,
         });
         if (data.code === "ACCOUNT_INACTIVE") {
-          setIsModalOpen(true);
+          setUserEmail(values.email);
         }
-
         return;
       }
       router.push("/");
@@ -95,7 +95,7 @@ export default function LoginForm() {
 
   return (
     <>
-      {/* <ResendEmailModal isModalOpen={isModalOpen}/> */}
+      <ResendEmailModal isModalOpen={isModalOpen} userEmail={userEmail} />
       <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
         <Card className="w-full sm:max-w-md">
           <div className="relative">
@@ -109,7 +109,22 @@ export default function LoginForm() {
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-card px-6 animate-in fade-in zoom-in-95 duration-200">
                 <div className="w-full rounded-lg bg-destructive/10 p-3 border border-destructive/20 flex items-center justify-between gap-2">
                   <p className="text-sm font-medium text-destructive text-center w-full">
-                    {errors.root.message}
+                    {errors.root?.message === "ACCOUNT_INACTIVE" ? (
+                      <span>
+                        Your account isn’t active yet. Please{" "}
+                        <span
+                          onClick={() => setIsModalOpen(true)}
+                          className="underline cursor-pointer"
+                        >
+                          click here to activate it
+                        </span>{" "}
+                        or reach out to support.
+                      </span>
+                    ) : (
+                      <div>
+                        {AUTH_ERROR_MESSAGES[errors.root.message || ""]}
+                      </div>
+                    )}
                   </p>
                   <button
                     type="button"

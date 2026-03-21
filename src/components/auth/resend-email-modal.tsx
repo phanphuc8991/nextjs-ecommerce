@@ -4,8 +4,17 @@ import { cn } from "@/lib/cn";
 import { defineStepper } from "@stepperize/react";
 import { CheckCircle, CreditCard, Home, User, BadgeCheck } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import React from "react";
-import { Dialog, DialogContent } from "../ui/dialog";
+import React, { useState } from "react";
+import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
+import { resendActivation } from "@/services/auth.service";
+import { Button } from "../ui/button";
+import { Spinner } from "../ui/spinner";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "../ui/input-otp";
 
 const stepper = defineStepper(
   { id: "login", label: "Login", icon: User },
@@ -19,15 +28,23 @@ const slideVariants = {
   exit: { opacity: 0 },
 };
 
-export const ResendEmailModal = ({isModalOpen}: {isModalOpen: boolean}) => {
+export const ResendEmailModal = ({
+  isModalOpen,
+  userEmail,
+}: {
+  isModalOpen: boolean;
+  userEmail: string;
+}) => {
   return (
     <stepper.Scoped>
       <Dialog open={isModalOpen}>
-        <DialogContent className="sm:max-w-[500px] p-0 ring-0" showCloseButton={false}>
-          <section
-            id="resend-email-modal"
-          >
-            <DemoContent />
+        <DialogContent
+          className="sm:max-w-[500px] p-0 ring-0"
+          showCloseButton={false}
+        >
+          <DialogTitle className="hidden"></DialogTitle>
+          <section id="resend-email-modal">
+            <ResendContent userEmail={userEmail} />
           </section>
         </DialogContent>
       </Dialog>
@@ -35,11 +52,12 @@ export const ResendEmailModal = ({isModalOpen}: {isModalOpen: boolean}) => {
   );
 };
 
-// #region DemoContent
+// #region Content
 
-const DemoContent = () => {
+const ResendContent = (props: any) => {
   const methods = stepper.useStepper();
-
+  const [isLoading, setIsLoading] = useState(false);
+  const [code, setCode] = useState("");
   const [formData, setFormData] = React.useState({
     firstName: "",
     lastName: "",
@@ -65,18 +83,31 @@ const DemoContent = () => {
     }
   };
 
-  const isComplete = methods.state.isLast;
+  const resend = async () => {
+    try {
+      setIsLoading(true);
+      const res = await resendActivation({
+        email: props.userEmail,
+      });
+      if (res) {
+        methods.navigation.next();
+      }
+      setIsLoading(false);
+    } catch (err: any) {
+      console.log("err", err);
+      setIsLoading(false);
+    }
+  };
 
+  const isComplete = methods.state.isLast;
+  console.log("methods.state", methods.state);
   return (
     <div className="max-w-2xl mx-auto">
       <div className="border border-gray-6 rounded-xl overflow-hidden bg-gray-2/30">
         <StepperHeader methods={methods} isComplete={isComplete} />
         <div className="p-6">
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className='h-[158px]'>
             <AnimatePresence mode="wait">
-              {/* <h3 className="text-base font-semibold text-gray-12 mb-4">
-                Activate Account
-              </h3> */}
               {methods.flow.when("login", () => (
                 <motion.div
                   key="step1"
@@ -86,7 +117,7 @@ const DemoContent = () => {
                   exit="exit"
                   transition={{ duration: 0.15 }}
                 >
-                  <LoginStep formData={formData} handleChange={handleChange} />
+                  <LoginStep userEmail={props.userEmail} />
                 </motion.div>
               ))}
               {methods.flow.when("verification", () => (
@@ -98,10 +129,7 @@ const DemoContent = () => {
                   exit="exit"
                   transition={{ duration: 0.15 }}
                 >
-                  <AddressStep
-                    formData={formData}
-                    handleChange={handleChange}
-                  />
+                  <Verification code={code} setCode={setCode} />
                 </motion.div>
               ))}
               {methods.flow.when("done", () => (
@@ -119,39 +147,22 @@ const DemoContent = () => {
                   />
                 </motion.div>
               ))}
-              {/* {methods.flow.when("success", () => (
-                <motion.div
-                  key="step4"
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ duration: 0.15 }}
-                >
-                  <CompletionScreen
-                    onReset={() => {
-                      methods.navigation.reset();
-                    }}
-                  />
-                </motion.div>
-              ))} */}
+             
             </AnimatePresence>
-            <div className="mt-6 flex justify-between">
-              {/* <button
-                  type="button"
-                  onClick={() => methods.navigation.prev()}
-                  className="px-3 py-2 text-sm font-medium rounded-lg border border-gray-7 text-gray-12 hover:bg-gray-4 transition-colors"
+            {methods.state.isFirst && (
+              <div className="mt-6 flex justify-between">
+                <Button
+                  type="submit"
+                  className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
+                  onClick={() => resend()}
+                  disabled={isLoading}
                 >
-                  Back
-                </button> */}
+                  {isLoading && <Spinner data-icon="inline-start" />}
 
-              <button
-                type="submit"
-                className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
-              >
-                Resend
-              </button>
-            </div>
+                  {isLoading ? "Resending..." : "Resend code"}
+                </Button>
+              </div>
+            )}
           </form>
         </div>
       </div>
@@ -159,7 +170,7 @@ const DemoContent = () => {
   );
 };
 
-// #endregion DemoContent
+// #endregion Content
 
 // #region InputField
 
@@ -177,7 +188,7 @@ const InputField = ({
   name: string;
   type?: string;
   value: string;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
@@ -220,7 +231,6 @@ const StepperHeader = ({
     methods.state.current.data.id === steps[steps.length - 1].id || isComplete
       ? "100%"
       : `${(currentIndex / (steps.length - 1)) * 100}%`;
-
   return (
     <nav className="bg-gray-3/50 border-b border-gray-6 px-4 py-5">
       <ol className="flex justify-between items-center relative">
@@ -278,16 +288,10 @@ const StepperHeader = ({
 
 // #region Login
 
-const LoginStep = ({
-  formData,
-  handleChange,
-}: {
-  formData: Record<string, string>;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}) => (
+const LoginStep = (data: any) => (
   <div>
     <h6 className="text-base font-semibold text-gray-12 mb-4">
-      Your account isn’t activated yet.
+      Activate your account.
     </h6>
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <div className="sm:col-span-2">
@@ -295,8 +299,7 @@ const LoginStep = ({
           label="Email"
           name="email"
           type="email"
-          value={formData.email}
-          onChange={handleChange}
+          value={data.userEmail}
           disabled
         />
       </div>
@@ -308,43 +311,45 @@ const LoginStep = ({
 
 // #region verification
 
-const AddressStep = ({
-  formData,
-  handleChange,
+const Verification = ({
+  code,
+  setCode,
 }: {
-  formData: Record<string, string>;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  code: string;
+  setCode: React.Dispatch<React.SetStateAction<string>>;
 }) => (
-  <div>
-    <h6 className="text-base font-semibold text-gray-12 mb-4">
-      Your account isn’t activated yet.
-    </h6>
-    <div className="space-y-4">
-      <InputField
-        label="Street Address"
-        name="address"
-        value={formData.address}
-        onChange={handleChange}
-        required
-      />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <InputField
-          label="City"
-          name="city"
-          value={formData.city}
-          onChange={handleChange}
-          required
-        />
-        <InputField
-          label="Zip Code"
-          name="zipCode"
-          value={formData.zipCode}
-          onChange={handleChange}
-          required
-        />
-      </div>
+  
+    <div className="h-[158px] flex justify-center items-center">
+      <InputOTP
+        maxLength={6}
+        value={code}
+        onChange={(value: any) => {
+          const onlyNums = value.replace(/[^0-9]/g, "");
+          setCode(onlyNums);
+        }}
+        inputMode="numeric"
+      >
+        <InputOTPGroup>
+          <InputOTPSlot index={0} />
+          <InputOTPSlot index={1} />
+        </InputOTPGroup>
+
+        <InputOTPSeparator />
+
+        <InputOTPGroup>
+          <InputOTPSlot index={2} />
+          <InputOTPSlot index={3} />
+        </InputOTPGroup>
+
+        <InputOTPSeparator />
+
+        <InputOTPGroup>
+          <InputOTPSlot index={4} />
+          <InputOTPSlot index={5} />
+        </InputOTPGroup>
+      </InputOTP>
     </div>
-  </div>
+  
 );
 
 // #endregion verification
@@ -358,44 +363,39 @@ const PaymentStep = ({
   formData: Record<string, string>;
   handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }) => (
-  <div>
-    <h3 className="text-base font-semibold text-gray-12 mb-4">
-      Your account isn’t activated yet.
-    </h3>
-    <div className="space-y-4">
+  <div className="flex justify-center">
+    <InputField
+      label="Name on Card"
+      name="cardName"
+      value={formData.cardName}
+      onChange={handleChange}
+      required
+    />
+    <InputField
+      label="Card Number"
+      name="cardNumber"
+      value={formData.cardNumber}
+      onChange={handleChange}
+      placeholder="XXXX XXXX XXXX XXXX"
+      required
+    />
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       <InputField
-        label="Name on Card"
-        name="cardName"
-        value={formData.cardName}
+        label="Expiry"
+        name="expiry"
+        value={formData.expiry}
         onChange={handleChange}
+        placeholder="MM/YY"
         required
       />
       <InputField
-        label="Card Number"
-        name="cardNumber"
-        value={formData.cardNumber}
+        label="CVV"
+        name="cvv"
+        value={formData.cvv}
         onChange={handleChange}
-        placeholder="XXXX XXXX XXXX XXXX"
+        placeholder="XXX"
         required
       />
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <InputField
-          label="Expiry"
-          name="expiry"
-          value={formData.expiry}
-          onChange={handleChange}
-          placeholder="MM/YY"
-          required
-        />
-        <InputField
-          label="CVV"
-          name="cvv"
-          value={formData.cvv}
-          onChange={handleChange}
-          placeholder="XXX"
-          required
-        />
-      </div>
     </div>
   </div>
 );
