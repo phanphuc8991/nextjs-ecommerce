@@ -12,6 +12,14 @@ export const registerUser = async (payload: {
   });
 };
 
+export const checkCode = async (payload: { _id: string; code: string }) => {
+  return sendRequest<IBackendRes<ILogin>>({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/check-code`,
+    method: "POST",
+    body: payload,
+  });
+};
+
 export const resendActivation = async (payload: { email: string }) => {
   return sendRequest<IBackendRes<ILogin>>({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/resend-activation`,

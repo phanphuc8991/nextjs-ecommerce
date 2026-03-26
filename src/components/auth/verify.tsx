@@ -22,6 +22,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { sendRequest } from "@/utils/api";
+import { checkCode } from "@/services/auth.service";
 
 const formSchema = z.object({
   _id: z.string(),
@@ -49,13 +50,9 @@ export default function VerifyForm(props: any) {
   } = form;
 
   async function onSubmit(values: FormValues) {
-    const res = await sendRequest<IBackendRes<ILogin>>({
-      url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/check-code`,
-      method: "POST",
-      body: {
-        _id: values._id,
-        code: values.code,
-      },
+    const res = await checkCode({
+      _id: values._id,
+      code: values.code,
     });
 
     if (res?.data) {

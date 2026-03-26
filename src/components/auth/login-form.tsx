@@ -52,7 +52,6 @@ export default function LoginForm() {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [userEmail, setUserEmail] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -62,6 +61,11 @@ export default function LoginForm() {
     },
   });
 
+  const resetForm = () => {
+    setIsModalOpen(false);
+    clearErrors("root");
+    form.reset();
+  };
   const {
     control,
     handleSubmit,
@@ -95,7 +99,11 @@ export default function LoginForm() {
 
   return (
     <>
-      <ResendEmailModal isModalOpen={isModalOpen} userEmail={userEmail} />
+      <ResendEmailModal
+        isModalOpen={isModalOpen}
+        resetForm={resetForm}
+        userEmail={userEmail}
+      />
       <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
         <Card className="w-full sm:max-w-md">
           <div className="relative">

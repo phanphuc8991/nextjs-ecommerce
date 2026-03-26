@@ -2,11 +2,18 @@
 
 import { cn } from "@/lib/cn";
 import { defineStepper } from "@stepperize/react";
-import { CheckCircle, CreditCard, Home, User, BadgeCheck } from "lucide-react";
+import {
+  CheckCircle,
+  CreditCard,
+  Home,
+  User,
+  BadgeCheck,
+  Check,
+} from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
-import { resendActivation } from "@/services/auth.service";
+import { checkCode, resendActivation } from "@/services/auth.service";
 import { Button } from "../ui/button";
 import { Spinner } from "../ui/spinner";
 import {
@@ -19,7 +26,7 @@ import {
 const stepper = defineStepper(
   { id: "login", label: "Login", icon: User },
   { id: "verification", label: "Verification", icon: BadgeCheck },
-  { id: "done", label: "Done", icon: CreditCard },
+  { id: "done", label: "Done", icon: Check },
 );
 
 const slideVariants = {
@@ -31,9 +38,11 @@ const slideVariants = {
 export const ResendEmailModal = ({
   isModalOpen,
   userEmail,
+  resetForm,
 }: {
   isModalOpen: boolean;
   userEmail: string;
+  resetForm: any;
 }) => {
   return (
     <stepper.Scoped>
@@ -44,7 +53,10 @@ export const ResendEmailModal = ({
         >
           <DialogTitle className="hidden"></DialogTitle>
           <section id="resend-email-modal">
-            <ResendContent userEmail={userEmail} />
+            <ResendContent
+              userEmail={userEmail}
+              resetForm={resetForm}
+            />
           </section>
         </DialogContent>
       </Dialog>
@@ -57,37 +69,31 @@ export const ResendEmailModal = ({
 const ResendContent = (props: any) => {
   const methods = stepper.useStepper();
   const [isLoading, setIsLoading] = useState(false);
+  const [userId, setUserId] = useState<any>("");
   const [code, setCode] = useState("");
-  const [formData, setFormData] = React.useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    address: "",
-    city: "",
-    zipCode: "",
-    cardName: "",
-    cardNumber: "",
-    expiry: "",
-    cvv: "",
-  });
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!methods.state.isLast) {
-      methods.navigation.next();
-    }
-  };
 
   const resend = async () => {
     try {
       setIsLoading(true);
       const res = await resendActivation({
         email: props.userEmail,
+      });
+      if (res) {
+        setUserId(res.data?._id);
+        methods.navigation.next();
+      }
+      setIsLoading(false);
+    } catch (err: any) {
+      console.log("err", err);
+      setIsLoading(false);
+    }
+  };
+  const active = async () => {
+    try {
+      setIsLoading(true);
+      const res = await checkCode({
+        _id: userId,
+        code: code,
       });
       if (res) {
         methods.navigation.next();
@@ -100,13 +106,67 @@ const ResendContent = (props: any) => {
   };
 
   const isComplete = methods.state.isLast;
-  console.log("methods.state", methods.state);
+
+  const renderButton = (methods: any) => {
+    const id = methods?.state?.current?.data?.id;
+    switch (id) {
+      case "login": {
+        return (
+          <div className="mt-6 flex justify-between">
+            <Button
+              type="submit"
+              className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
+              onClick={() => resend()}
+              disabled={isLoading}
+            >
+              {isLoading && <Spinner data-icon="inline-start" />}
+
+              {isLoading ? "Resending..." : "Resend code"}
+            </Button>
+          </div>
+        );
+      }
+      case "verification": {
+        return (
+          <div className="mt-6 flex justify-between">
+            <Button
+              type="submit"
+              className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
+              onClick={() => active()}
+              disabled={isLoading}
+            >
+              {isLoading && <Spinner data-icon="inline-start" />}
+
+              {isLoading ? "Activating..." : "Activate"}
+            </Button>
+          </div>
+        );
+      }
+
+      default: {
+        return (
+          <div className="mt-6 flex justify-between">
+            <Button
+              type="submit"
+              className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
+              onClick={() => {
+                props.resetForm();
+              }}
+              disabled={isLoading}
+            >
+              Close
+            </Button>
+          </div>
+        );
+      }
+    }
+  };
   return (
     <div className="max-w-2xl mx-auto">
       <div className="border border-gray-6 rounded-xl overflow-hidden bg-gray-2/30">
         <StepperHeader methods={methods} isComplete={isComplete} />
         <div className="p-6">
-          <form onSubmit={handleSubmit} className='h-[158px]'>
+          <form className="h-[158px]">
             <AnimatePresence mode="wait">
               {methods.flow.when("login", () => (
                 <motion.div
@@ -141,28 +201,15 @@ const ResendContent = (props: any) => {
                   exit="exit"
                   transition={{ duration: 0.15 }}
                 >
-                  <PaymentStep
-                    formData={formData}
-                    handleChange={handleChange}
-                  />
+                  <h4 className="pt-[50px] pb-[25px]">
+                    Great! Your account is now active. You can start using it
+                    right away.
+                  </h4>
                 </motion.div>
               ))}
-             
             </AnimatePresence>
-            {methods.state.isFirst && (
-              <div className="mt-6 flex justify-between">
-                <Button
-                  type="submit"
-                  className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
-                  onClick={() => resend()}
-                  disabled={isLoading}
-                >
-                  {isLoading && <Spinner data-icon="inline-start" />}
 
-                  {isLoading ? "Resending..." : "Resend code"}
-                </Button>
-              </div>
-            )}
+            {renderButton(methods)}
           </form>
         </div>
       </div>
@@ -309,7 +356,7 @@ const LoginStep = (data: any) => (
 
 // #endregion Login
 
-// #region verification
+// #region Verification
 
 const Verification = ({
   code,
@@ -318,109 +365,42 @@ const Verification = ({
   code: string;
   setCode: React.Dispatch<React.SetStateAction<string>>;
 }) => (
-  
-    <div className="h-[158px] flex justify-center items-center">
-      <InputOTP
-        maxLength={6}
-        value={code}
-        onChange={(value: any) => {
-          const onlyNums = value.replace(/[^0-9]/g, "");
-          setCode(onlyNums);
-        }}
-        inputMode="numeric"
-      >
-        <InputOTPGroup>
-          <InputOTPSlot index={0} />
-          <InputOTPSlot index={1} />
-        </InputOTPGroup>
-
-        <InputOTPSeparator />
-
-        <InputOTPGroup>
-          <InputOTPSlot index={2} />
-          <InputOTPSlot index={3} />
-        </InputOTPGroup>
-
-        <InputOTPSeparator />
-
-        <InputOTPGroup>
-          <InputOTPSlot index={4} />
-          <InputOTPSlot index={5} />
-        </InputOTPGroup>
-      </InputOTP>
-    </div>
-  
-);
-
-// #endregion verification
-
-// #region done
-
-const PaymentStep = ({
-  formData,
-  handleChange,
-}: {
-  formData: Record<string, string>;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}) => (
-  <div className="flex justify-center">
-    <InputField
-      label="Name on Card"
-      name="cardName"
-      value={formData.cardName}
-      onChange={handleChange}
-      required
-    />
-    <InputField
-      label="Card Number"
-      name="cardNumber"
-      value={formData.cardNumber}
-      onChange={handleChange}
-      placeholder="XXXX XXXX XXXX XXXX"
-      required
-    />
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      <InputField
-        label="Expiry"
-        name="expiry"
-        value={formData.expiry}
-        onChange={handleChange}
-        placeholder="MM/YY"
-        required
-      />
-      <InputField
-        label="CVV"
-        name="cvv"
-        value={formData.cvv}
-        onChange={handleChange}
-        placeholder="XXX"
-        required
-      />
-    </div>
-  </div>
-);
-
-// #endregion done
-
-// #region CompletionScreen
-
-const CompletionScreen = ({ onReset }: { onReset: () => void }) => (
-  <div className="text-center py-8">
-    <div className="size-14 bg-green-9 rounded-full flex items-center justify-center mx-auto mb-4">
-      <CheckCircle className="size-7 text-white" />
-    </div>
-    <h3 className="text-lg font-semibold text-gray-12 mb-1">Done!</h3>
-    <p className="text-sm text-gray-11 mb-6">Form submitted successfully.</p>
-    <button
-      type="button"
-      onClick={onReset}
-      className="px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 transition-colors"
+  <div className="">
+    <h6 className="text-base font-semibold text-gray-12 mb-4">
+      Please enter the verification code.
+    </h6>
+    <label className="block text-sm font-medium text-gray-12 mb-1">Code</label>
+    <InputOTP
+      maxLength={6}
+      value={code}
+      onChange={(value: any) => {
+        const onlyNums = value.replace(/[^0-9]/g, "");
+        setCode(onlyNums);
+      }}
+      inputMode="numeric"
     >
-      Start over
-    </button>
+      <InputOTPGroup>
+        <InputOTPSlot index={0} />
+        <InputOTPSlot index={1} />
+      </InputOTPGroup>
+
+      <InputOTPSeparator />
+
+      <InputOTPGroup>
+        <InputOTPSlot index={2} />
+        <InputOTPSlot index={3} />
+      </InputOTPGroup>
+
+      <InputOTPSeparator />
+
+      <InputOTPGroup>
+        <InputOTPSlot index={4} />
+        <InputOTPSlot index={5} />
+      </InputOTPGroup>
+    </InputOTP>
   </div>
 );
 
-// #endregion CompletionScreen
+// #endregion Verification
 
 export default ResendEmailModal;
