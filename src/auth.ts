@@ -1,12 +1,15 @@
-import NextAuth, { AuthError, CredentialsSignin } from "next-auth";
+import NextAuth, { AuthError } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { sendRequest } from "./utils/api";
 import { IUser } from "./types/next-auth";
 import { AdapterUser } from "next-auth/adapters";
-import { loginUser } from "@/services/auth.service";
-
+import { loginGoogle, loginUser } from "@/services/auth.service";
+import GoogleProvider from "next-auth/providers/google";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
+    GoogleProvider({
+      clientId: process.env.AUTH_GOOGLE_ID!,
+      clientSecret: process.env.AUTH_GOOGLE_SECRET!,
+    }),
     Credentials({
       credentials: {
         email: {},
@@ -31,15 +34,31 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     signIn: "auth/login",
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === "google") {
+        const idToken = account?.id_token as string;
+        const res = await loginGoogle({ idToken });
+        (user as any).backendData = res;
+      }
+      return true;
+    },
     jwt({ token, user }) {
       if (user) {
-        token.user = user as AdapterUser & IUser;
+        if ("backendData" in user) {
+          token.user = user.backendData as AdapterUser & IUser;
+        } else {
+          token.user = user as AdapterUser & IUser;
+        }
       }
       return token;
     },
     session({ session, token }) {
       session.user = token.user as AdapterUser & IUser;
       return session;
+    },
+    authorized: async ({ auth }) => {
+       console.log('auth',auth);
+      return !!auth
     },
   },
 });

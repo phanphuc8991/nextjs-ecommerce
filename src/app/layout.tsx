@@ -4,8 +4,9 @@ import { inter } from "@/fonts";
 import { Toaster } from "@/components/ui/sonner";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
+import NextAuthWrapper from "@/lib/nextauth-wrapper";
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'});
+const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -20,8 +21,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${inter.className} antialiased bg-neutral-50`}>
-        {children}
-       <Toaster/>
+        <NextAuthWrapper>{children}</NextAuthWrapper>
+        <Toaster />
       </body>
     </html>
   );

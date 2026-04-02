@@ -27,6 +27,7 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import ResendEmailModal from "./resend-email-modal";
 import { AUTH_ERROR_MESSAGES } from "@/utils/errors";
+import { signIn } from "next-auth/react";
 
 const loginSchema = z.object({
   email: z
@@ -109,9 +110,6 @@ export default function LoginForm() {
           <div className="relative">
             <CardHeader className="text-center">
               <CardTitle className="text-xl">Welcome back</CardTitle>
-              <CardDescription>
-                Login with your Apple or Google account
-              </CardDescription>
             </CardHeader>
             {errors.root && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-card px-6 animate-in fade-in zoom-in-95 duration-200">
@@ -148,11 +146,12 @@ export default function LoginForm() {
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)}>
               <Field>
-                <Button variant="outline" type="button">
+                {/* <Button variant="outline" type="button">
                   Login with Apple
-                </Button>
+                </Button> */}
 
-                <Button variant="outline" type="button">
+                <Button className='cursor-pointer' variant="outline" type="button"  onClick={() => signIn('google',  { callbackUrl: "/" })}
+        >
                   Login with Google
                 </Button>
               </Field>
@@ -255,10 +254,10 @@ export default function LoginForm() {
           </CardContent>
         </Card>
 
-        <FieldDescription className="px-6 text-center">
+        {/* <FieldDescription className="px-6 text-center">
           By clicking continue, you agree to our{" "}
           <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.
-        </FieldDescription>
+        </FieldDescription> */}
       </div>
     </>
   );
