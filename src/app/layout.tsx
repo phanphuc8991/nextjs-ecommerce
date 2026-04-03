@@ -5,7 +5,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import NextAuthWrapper from "@/lib/nextauth-wrapper";
-
+import { TooltipProvider } from "@/components/ui/tooltip";
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
@@ -21,7 +21,9 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className={`${inter.className} antialiased bg-neutral-50`}>
-        <NextAuthWrapper>{children}</NextAuthWrapper>
+        <NextAuthWrapper>
+          <TooltipProvider> {children}</TooltipProvider>
+        </NextAuthWrapper>
         <Toaster />
       </body>
     </html>
