@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Toaster } from "@/components/ui/sonner";
+import { Toaster } from "sonner";
 import NextAuthWrapper from "@/lib/nextauth-wrapper";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { geist, outfit } from "@/fonts";
@@ -21,7 +21,7 @@ export default function RootLayout({
         <NextAuthWrapper >
           <TooltipProvider> {children}</TooltipProvider>
         </NextAuthWrapper>
-        <Toaster />
+        <Toaster className="z-[9999]"/>
       </body>
     </html>
   );

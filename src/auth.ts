@@ -1,7 +1,5 @@
 import NextAuth, { AuthError } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { IUser } from "./types/next-auth";
-import { AdapterUser } from "next-auth/adapters";
 import { loginGoogle, loginUser } from "@/services/auth.service";
 import GoogleProvider from "next-auth/providers/google";
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -45,15 +43,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     jwt({ token, user }) {
       if (user) {
         if ("backendData" in user) {
-          token.user = user.backendData as AdapterUser & IUser;
+          token.user = user.backendData as any;
         } else {
-          token.user = user as AdapterUser & IUser;
+          token.user = user as any;
         }
       }
       return token;
     },
     session({ session, token }) {
-      session.user = token.user as AdapterUser & IUser;
+      session.user = token.user as any;
       return session;
     },
     authorized: async ({ auth }) => {

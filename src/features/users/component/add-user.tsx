@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { CirclePlus } from "lucide-react";
 import {
   Dialog,
   DialogClose,
@@ -18,48 +19,7 @@ import {
   FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Controller, useForm } from "react-hook-form";
-import * as z from "zod";
-
-// Schema validation
-// const addUserSchema = z.object({
-//   firstName: z.string().trim().min(1, "Please enter your first name"),
-//   lastName: z.string().trim().min(1, "Please enter your last name"),
-//   email: z
-//     .email("Please enter a valid email")
-//     .trim()
-//     .min(1, "Please enter your email"),
-//   password: z
-//     .string()
-//     .trim()
-//     .min(8, "Password must be at least 8 characters")
-//     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-//     .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-//     .regex(/[0-9]/, "Password must contain at least one number")
-//     .regex(
-//       /[^A-Za-z0-9]/,
-//       "Password must contain at least one special character",
-//     ),
-//   role: z.enum(["customer", "admin", "staff"]),
-//   status: z.enum(["active", "inactive"]),
-//   image: z.any().optional(),
-// });
-
-const addUserSchema = z.object({
-  firstName: z.string(),
-  lastName: z.string(),
-  email: z.string(),
-
-  password: z.string(),
-
-  role: z.enum(["customer", "admin", "staff"]),
-  status: z.enum(["active", "inactive"]),
-  avatar: z.any().optional(),
-});
-
-type AddUserValues = z.infer<typeof addUserSchema>;
-
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Upload } from "lucide-react";
 import {
@@ -67,16 +27,21 @@ import {
   SelectContent,
   SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "./ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-export default function AddUser(props: any) {
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { CreateUserPayload } from "../types";
+import { addUserSchema } from "../constants";
+import { createUserAction } from "../actions";
+import { toast } from "sonner";
+
+const AddUser = () => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const [preview, setPreview] = useState("https://github.com/shadcn.png");
-  const form = useForm<AddUserValues>({
+  const [preview, setPreview] = useState("");
+
+  const form = useForm<CreateUserPayload>({
     resolver: zodResolver(addUserSchema),
     defaultValues: {
       firstName: "",
@@ -85,7 +50,7 @@ export default function AddUser(props: any) {
       password: "",
       role: "customer",
       status: "inactive",
-      avatar: null,
+      avatar: undefined,
     },
   });
   const {
@@ -93,60 +58,62 @@ export default function AddUser(props: any) {
     handleSubmit,
     setError,
     clearErrors,
+    reset,
     formState: { errors, isSubmitting },
   } = form;
-  console.log("errors", errors);
   const handleClick = () => {
     inputRef.current?.click();
   };
-  const handleChange = (e: any, field: any) => {
+
+  const handleChangeFile = (e: any, field: any) => {
     const file = e.target?.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) return;
-    if (file.size > 2 * 1024 * 1024) return;
     const previewUrl = URL.createObjectURL(file);
     setPreview(previewUrl);
     field.onChange(file);
   };
-  const { trigger } = props;
 
-  async function onSubmit(values: any) {
+  const onSubmit: SubmitHandler<CreateUserPayload> = async (
+    values: CreateUserPayload,
+  ) => {
     clearErrors("root");
-    console.log("values", values);
     try {
-      const formData = new FormData(); // Tạo FormData để gửi file + text
-
-      // === Phần 1: Thêm tất cả các trường text (name, email, role, password...) ===
-      Object.entries(values).forEach(([key, value]) => {
-        if (key !== "avatar" && value !== undefined) {
-          formData.append(key, String(value));
-        }
-      });
-      if (values.avatar) {
-        formData.append("avatar", values.avatar);
-
-        const res = await fetch(
-          `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/upload-avatar`,
-          {
-            method: "POST",
-            body: formData, // Quan trọng: gửi dưới dạng FormData (multipart/form-data)
-          },
-        );
+      const res = await createUserAction(values);
+      if (res.statusCode === 201) {
+        toast.success("User added successfully", { position: "top-center" });
       }
-    } catch (err: any) {}
-  }
+    } catch (err: any) {
+        console.log("error",err);
+       const message = '';
+      toast.error(message || "Something went wrong", {
+        position: "top-center",
+      });
+    }
+  };
+
+  const onOpenChange = () => {
+    setPreview("");
+    reset();
+  };
   return (
-    <Dialog
-      onOpenChange={() => {
-        setPreview("https://github.com/shadcn.png");
-      }}
-    >
-      <DialogTrigger asChild>{trigger}</DialogTrigger>
+    <Dialog onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button
+          size="sm"
+          variant="default"
+          className="text-sm font-medium px-4 py-[17px] tracking-tight hover:opacity-80 transition"
+        >
+          <CirclePlus className="mr-1" />
+          Add new user
+        </Button>
+      </DialogTrigger>
 
       <DialogContent className="lg:max-w-2xl">
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogHeader className="align-center mb-5">
             <DialogTitle>Add New User</DialogTitle>
+
+            <DialogDescription></DialogDescription>
           </DialogHeader>
           <div className="grid grid-cols-2 grid-rows-3 gap-x-4 gap-y-6">
             <FieldGroup>
@@ -201,7 +168,7 @@ export default function AddUser(props: any) {
                       type="file"
                       hidden
                       ref={inputRef}
-                      onChange={(e) => handleChange(e, field)}
+                      onChange={(e) => handleChangeFile(e, field)}
                     />
                   </div>
                   {fieldState.error && (
@@ -380,10 +347,14 @@ export default function AddUser(props: any) {
             <DialogClose asChild>
               <Button variant="outline">Cancel</Button>
             </DialogClose>
-            <Button type="submit">Save changes</Button>
+            <Button disabled={isSubmitting} type="submit">
+              {isSubmitting ? "Creating..." : "Create User"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default AddUser;

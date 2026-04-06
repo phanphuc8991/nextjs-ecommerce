@@ -38,9 +38,6 @@ export const columns: ColumnDef<Payment>[] = [
     maxSize: 300,
     header: "Name",
     cell: ({ row }) => {
-      console.log("row", row);
-      console.log("name", row.getValue("name"));
-      console.log("avatar", row.original.avatar);
       const name: string = row.getValue("name");
       const avatar = row.original.avatar;
       return (

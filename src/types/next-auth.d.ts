@@ -9,6 +9,7 @@ export interface IUser {
   isVerify?: boolean;
   type?: string;
   role?: string;
+  access_token: string;
 }
 declare module "next-auth/jwt" {
   /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
