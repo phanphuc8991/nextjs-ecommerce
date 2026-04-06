@@ -7,9 +7,6 @@ const config: Config = {
       colors: {
         vercel: "#0070F3",
       },
-      fontFamily: {
-        outfit: ["Outfit", "sans-serif"], 
-      },
     },
   },
   plugins: [],

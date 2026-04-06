@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import Link from "next/link";
 import { BadgeCheck, CreditCard, Bell, LogOut } from "lucide-react";
+import { signOut } from "@/auth";
 
 export function SiteHeader() {
   return (
@@ -83,7 +83,13 @@ export function SiteHeader() {
                   </li>
                 </ul>
                 <div className="w-full bg-border h-px"></div>
-                <div className="p-1 cursor-pointer">
+                <div
+                  className="p-1 cursor-pointer"
+                  onClick={async () => {
+                    "use server";
+                    await signOut();
+                  }}
+                >
                   <div className="flex gap-2 items-center py-1.5  px-2 hover:bg-[#e4e4e8] rounded-sm">
                     <span>
                       <LogOut className="text-[#acacac] w-4 h-4" />

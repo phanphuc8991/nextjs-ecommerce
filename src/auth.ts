@@ -57,7 +57,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       return session;
     },
     authorized: async ({ auth }) => {
-       console.log('auth',auth);
       return !!auth
     },
   },

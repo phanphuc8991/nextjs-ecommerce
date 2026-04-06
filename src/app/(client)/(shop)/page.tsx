@@ -4,7 +4,6 @@ import Carousel from "@/components/client/carousel";
 import ThreeItemGrid from "@/components/client/grid/three-items";
 export default async function HomePage() {
   const session = await auth();
-  console.log('session',session);
   return (
     <>
        <div>{JSON.stringify(session)}</div>

@@ -10,7 +10,6 @@ const VerifyPage = async ({
   const { _id } = await params;
   const { e } = await searchParams;
   const email = e ? atob(e) : "";
-  console.log('email',email);
   return (
     <div>
       <Verify _id={_id} email={email} />

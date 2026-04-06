@@ -15,7 +15,6 @@ import { useRouter } from "next/navigation";
 export default function InformationPage() {
   const [enabled, setEnabled] = useState(true);
   const router = useRouter();
-  console.log('window.history.state',window.history.state);
   const continueShippingProcess = () => {
     router.push("/checkout/shipping", { scroll: false });
   };

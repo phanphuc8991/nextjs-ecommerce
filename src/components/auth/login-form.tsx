@@ -89,7 +89,7 @@ export default function LoginForm() {
         }
         return;
       }
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       setError("root", {
         type: "manual",
@@ -114,7 +114,7 @@ export default function LoginForm() {
             {errors.root && (
               <div className="absolute inset-0 z-10 flex items-center justify-center bg-card px-6 animate-in fade-in zoom-in-95 duration-200">
                 <div className="w-full rounded-lg bg-destructive/10 p-3 border border-destructive/20 flex items-center justify-between gap-2">
-                  <p className="text-sm font-medium text-destructive text-center w-full">
+                  <div className="text-sm font-medium text-destructive text-center w-full">
                     {errors.root?.message === "ACCOUNT_INACTIVE" ? (
                       <span>
                         Your account isn’t active yet. Please{" "}
@@ -131,7 +131,7 @@ export default function LoginForm() {
                         {AUTH_ERROR_MESSAGES[errors.root.message || ""]}
                       </div>
                     )}
-                  </p>
+                  </div>
                   <button
                     type="button"
                     onClick={() => clearErrors("root")}
