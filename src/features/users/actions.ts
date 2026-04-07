@@ -4,9 +4,6 @@ import { CreateUserPayload } from "./types";
 import { createUser } from "./services";
 
 export async function createUserAction(data: CreateUserPayload) {
-  const session: any = await auth();
-  const accessToken = session?.user?.data?.access_token;
-  if (!accessToken) throw new Error("Unauthorized");
   const formData = new FormData();
   Object.entries(data).forEach(([key, value]) => {
     if (key !== "avatar" && value !== undefined) {
@@ -16,5 +13,5 @@ export async function createUserAction(data: CreateUserPayload) {
   if (data.avatar) {
     formData.append("avatar", data.avatar);
   }
-  return await createUser(formData, accessToken);
+  return await createUser(formData);
 }

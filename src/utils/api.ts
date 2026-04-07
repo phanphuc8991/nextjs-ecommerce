@@ -1,102 +1,73 @@
-import queryString from "query-string";
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { auth } from "@/auth";
+import { ApiResponse } from "@/types/backend";
 
-type IRequest = {
-  url: string;
-  method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
-  body?: Record<string, any> | FormData | null;
-  queryParams?: Record<string, any>;
-  useCredentials?: boolean;
-  headers?: Record<string, string>;
-  nextOption?: RequestInit;
-};
+const api: AxiosInstance = axios.create({
+  baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+  timeout: 30000,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
 
-const isFormData = (val: any): val is FormData =>
-  typeof FormData !== "undefined" && val instanceof FormData;
-
-export const sendRequest = async <T>(props: IRequest): Promise<T> => {
-  let {
-    url,
-    method,
-    body,
-    queryParams = {},
-    useCredentials = false,
-    headers = {},
-    nextOption = {},
-  } = props;
-
-  // Xử lý query params
-  let finalUrl = url;
-  if (Object.keys(queryParams).length > 0) {
-    const query = queryString.stringify(queryParams, {
-      skipNull: true,
-      skipEmptyString: true,
-    });
-    finalUrl = `${url}?${query}`;
+api.interceptors.request.use(async (config) => {
+  const session = await auth();
+  const token = session?.user?.access_token;
+  if (!token) {
+    config.headers.Authorization = `Bearer ${token}`;
   }
+  return config;
+});
 
-  const isFD = isFormData(body);
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const status = error.response?.status;
+    if (status === 401) {
+      console.warn("Token expired or invalid");
+      // await logout();
+      // or await refreshToken();
+    }
+    return Promise.reject(error);
+  },
+);
 
-  const options: RequestInit = {
-    method,
-    headers: {
-      ...(isFD ? {} : { "Content-Type": "application/json" }),
-      ...headers,
-    },
-    ...nextOption, // nextOption override sau cùng
-  };
-
-  if (useCredentials) {
-    options.credentials = "include";
-  }
-
-  // Body
-  if (body && method !== "GET") {
-    options.body = isFD ? body : JSON.stringify(body);
-  }
-
-  // Fetch với timeout (tùy chọn)
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 30000); // 30s
-  options.signal = controller.signal;
-
-  let res: Response;
+export const sendRequest = async <T = any>(
+  config: AxiosRequestConfig,
+): Promise<ApiResponse<T>> => {
   try {
-    res = await fetch(finalUrl, options);
+    const response = await api.request<T>(config);
+    return {
+      success: true,
+      data: response.data,
+      statusCode: response.status,
+    };
   } catch (error: any) {
-    console.log("error", error);
-    clearTimeout(timeout);
-    if (error.name === "AbortError") {
-      throw { statusCode: 0, error: "REQUEST_TIMEOUT" };
+    if (axios.isAxiosError(error)) {
+      const { response } = error;
+      if (!response) {
+        const message =
+          error.code === "ECONNABORTED" ? "REQUEST_TIMEOUT" : "NETWORK_ERROR";
+        return {
+          success: false,
+          statusCode: 0,
+          message,
+          raw: error,
+        };
+      }
+      const message = response.data?.message || "UNKNOWN_ERROR";
+      return {
+        success: false,
+        statusCode: response.status,
+        message,
+        raw: response.data,
+      };
     }
-    throw { statusCode: 0, error: "NETWORK_ERROR" };
-  } finally {
-    clearTimeout(timeout);
+    return {
+      success: false,
+      statusCode: 0,
+      message: "UNKNOWN_ERROR",
+      raw: error,
+    };
   }
-
-  // Parse response an toàn
-  let data: any = null;
-  const contentType = res.headers.get("content-type") || "";
-
-  if (contentType.includes("application/json")) {
-    try {
-      const text = await res.text();
-      data = text ? JSON.parse(text) : null;
-    } catch (e) {
-      console.warn("JSON parse error:", e);
-      data = null;
-    }
-  } else if (contentType.includes("text/")) {
-    data = await res.text();
-  }
-
-  // Handle error
-  if (!res.ok) {
-    const error = new Error(data?.error || data?.message || "UNKNOWN_ERROR");
-    (error as any).statusCode = res.status;
-    (error as any).raw = data;
-    console.log('error',error);
-    throw error;
-  }
-
-  return data as T;
 };

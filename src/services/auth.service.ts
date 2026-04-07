@@ -1,3 +1,5 @@
+
+import { ApiResponse, ResponseUserLogin, LoginInput } from "@/types/backend";
 import { sendRequest } from "@/utils/api";
 
 export const registerUser = async (payload: {
@@ -5,43 +7,45 @@ export const registerUser = async (payload: {
   email: string;
   password: any;
 }) => {
-  return sendRequest<IBackendRes<ILogin>>({
+  return sendRequest({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/register`,
     method: "POST",
-    body: payload,
+    data: payload,
   });
 };
 
 export const checkCode = async (payload: { _id: string; code: string }) => {
-  return sendRequest<IBackendRes<ILogin>>({
+  return sendRequest({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/check-code`,
     method: "POST",
-    body: payload,
+    data: payload,
   });
 };
 
 export const resendActivation = async (payload: { email: string }) => {
-  return sendRequest<IBackendRes<ILogin>>({
+  return sendRequest({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/resend-activation`,
     method: "POST",
-    body: payload,
+    data: payload,
   });
 };
 
-export const loginUser = async (payload: { username: any; password: any }):  Promise<IBackendRes<ILogin>> => {
-  return sendRequest<IBackendRes<ILogin>>({
+
+
+export const loginUser = async (payload: LoginInput):Promise<ApiResponse<ResponseUserLogin>> => {
+  return sendRequest({
     method: "POST",
-    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/login`,
-    body: payload,
+    url: `/api/v1/auth/login`,
+    data: payload,
   });
 };
 
 export const loginGoogle = async (payload: {
   idToken: string;
-}): Promise<IBackendRes<ILogin>> => {
-  return sendRequest<IBackendRes<ILogin>>({
+}) => {
+  return sendRequest({
     method: "POST",
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/google-login`,
-    body: payload,
+    data: payload,
   });
 };

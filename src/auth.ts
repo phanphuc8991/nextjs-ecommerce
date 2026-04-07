@@ -1,7 +1,9 @@
-import NextAuth, { AuthError } from "next-auth";
+import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { loginGoogle, loginUser } from "@/services/auth.service";
 import GoogleProvider from "next-auth/providers/google";
+import { ResponseUserLogin } from "./types/backend";
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
     GoogleProvider({
@@ -9,21 +11,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
     }),
     Credentials({
-      credentials: {
-        email: {},
-        password: {},
-      },
-      authorize: async (credentials): Promise<any> => {
+      authorize: async (credentials) => {
         try {
+          if (
+            !credentials ||
+            typeof credentials.email !== "string" ||
+            typeof credentials.password !== "string"
+          )
+            return null;
           const res = await loginUser({
-            username: credentials.email,
+            email: credentials.email,
             password: credentials.password,
           });
-          return res;
-        } catch (err: any) {
-          const authError = new AuthError();
-          (authError as any).error = err.error;
-          throw authError;
+          if (res.success) {
+            return res.data;
+          } else {
+            throw new Error(res.message);
+          }
+        } catch (err) {
+          const error = err as string;
+          throw new Error(error);
         }
       },
     }),
@@ -45,17 +52,22 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         if ("backendData" in user) {
           token.user = user.backendData as any;
         } else {
-          token.user = user as any;
+          token.user = user as ResponseUserLogin;
         }
       }
       return token;
     },
     session({ session, token }) {
-      session.user = token.user as any;
+      if (token.user) {
+        session.user = {
+          ...session.user,
+          ...token.user,
+        };
+      }
       return session;
     },
     authorized: async ({ auth }) => {
-      return !!auth
+      return !!auth;
     },
   },
 });

@@ -78,14 +78,20 @@ const AddUser = () => {
   ) => {
     clearErrors("root");
     try {
-      const res = await createUserAction(values);
-      if (res.statusCode === 201) {
+      const result = await createUserAction(values);
+      console.log('result',result);
+      if (result.success) {
         toast.success("User added successfully", { position: "top-center" });
+      } else {
+        console.log("Lỗi:", result.message);
+        console.log("Status:", result.statusCode);
+        console.log("Raw data:", result.raw);
+        toast.error(result.message, {
+          position: "top-center",
+        });
       }
-    } catch (err: any) {
-        console.log("error",err);
-       const message = '';
-      toast.error(message || "Something went wrong", {
+    } catch (error) {
+      toast.error("Something went wrong", {
         position: "top-center",
       });
     }

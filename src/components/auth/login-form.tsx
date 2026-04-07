@@ -79,6 +79,7 @@ export default function LoginForm() {
     clearErrors("root");
     try {
       const data = await authenticate(values.email, values.password);
+      
       if (!data.success) {
         setError("root", {
           type: "manual",

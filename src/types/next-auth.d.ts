@@ -1,94 +1,26 @@
-import NextAuth, { DefaultSession } from "next-auth";
+import { DefaultSession, DefaultUser } from "next-auth";
 import { JWT } from "next-auth/jwt";
+import { ResponseUserLogin } from "@/types/backend";
 
-export interface IUser {
-  _id: string;
-  username?: string;
-  name: string;
+export interface LoginResponse {
+  // cấu trúc response từ loginUser / loginGoogle của bạn
+  user: BackendUser;
+  accessToken?: string;
+  refreshToken?: string;
+  // ... các field khác
+}
+
+export interface CredentialsInput {
   email: string;
-  isVerify?: boolean;
-  type?: string;
-  role?: string;
-  access_token: string;
+  password: string;
+}
+declare module "next-auth" {
+    interface User {
+    access_token?: string;
+  }
 }
 declare module "next-auth/jwt" {
-  /** Returned by the `jwt` callback and `getToken`, when using JWT sessions */
   interface JWT {
-    access_token: string;
-    refresh_token: string;
-    user: IUser;
-    access_expire: number;
-    error: string;
+    user?: ResponseUserLogin;
   }
 }
-
-declare module "next-auth" {
-  /**
-   * Returned by `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
-   */
-  export interface User {
-    data: {
-      user: {
-        _id: string;
-        name: string;
-        email: string;
-      };
-    };
-    access_token: string;
-  }
-  interface Session {
-    user: IUser;
-    access_token: string;
-    refresh_token: string;
-    access_expire: number;
-    error: string;
-  }
-}
-export { }
-
-declare global {
-
-    interface IRequest {
-        url: string,
-        method: string,
-        body?: {[key: string]: any},
-        queryParams?: any,
-        useCredentials?: boolean,
-        headers?: any,
-        nextOption?: any,
-    }
-
-    interface IBackendRes<T> {
-        error?: string | string[],
-        message: string,
-        statusCode?: number | string,
-        data?: T,
-    }
-
-    interface IModelPaginate<T> {
-        meta: {
-            current: number,
-            pageSize: number
-            pages: number,
-            total: number
-        },
-        result: T[]
-    }
-
-    interface ILogin {
-        user: {
-            _id: string,
-            name: string,
-            email: string,
-        }
-        access_token: string,
-    }
-}
-
-
-
-
-
-
-
-
