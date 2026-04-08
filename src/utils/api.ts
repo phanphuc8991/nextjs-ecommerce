@@ -13,7 +13,7 @@ const api: AxiosInstance = axios.create({
 api.interceptors.request.use(async (config) => {
   const session = await auth();
   const token = session?.user?.access_token;
-  if (!token) {
+  if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;

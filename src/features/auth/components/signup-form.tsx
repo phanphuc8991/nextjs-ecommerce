@@ -17,50 +17,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { routes } from "@/routes";
 import Link from "next/link";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { useState } from "react";
-import PasswordInput from "../ui/password-input";
+import PasswordInput from "@/components/ui/password-input";
 import { useRouter } from "next/navigation";
-import { registerUser } from "@/services/auth.service";
+
 import { AUTH_ERROR_MESSAGES } from "@/utils/errors";
-
-const loginSchema = z
-  .object({
-    name: z
-      .string()
-      .trim()
-      .min(2, "Name must be at least 2 characters")
-      .regex(/^[A-Za-z\s]+$/, "Name can only contain letters"),
-
-    email: z
-      .email("Please enter a valid email")
-      .trim()
-      .min(1, "Please enter your email"),
-
-    password: z
-      .string()
-      .trim()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Password must contain uppercase letter")
-      .regex(/[a-z]/, "Password must contain lowercase letter")
-      .regex(/[0-9]/, "Password must contain number")
-      .regex(/[^A-Za-z0-9]/, "Password must contain special character"),
-
-    confirmPassword: z.string().trim().min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
-  });
-
-type LoginValues = z.infer<typeof loginSchema>;
+import { registerUser } from "../services";
+import { signUpSchema, SignUpValues } from "../constants";
 
 export default function SignupForm(props: any) {
   const router = useRouter();
-  const form = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<SignUpValues>({
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -76,7 +45,7 @@ export default function SignupForm(props: any) {
     formState: { errors, isSubmitting },
   } = form;
 
-  async function onSubmit(values: LoginValues) {
+  async function onSubmit(values: SignUpValues) {
     clearErrors("root");
     try {
       const res = await registerUser({
@@ -84,9 +53,9 @@ export default function SignupForm(props: any) {
         email: values.email,
         password: values.password,
       });
-      
-      if (res?.data?._id) {
-        console.log
+
+      if (res?._id) {
+        console.log;
         const encodedEmail = btoa(res?.data?.email);
         router.push(
           `/verify/${res.data._id}?e=${encodeURIComponent(encodedEmail)}`,
@@ -223,7 +192,6 @@ export default function SignupForm(props: any) {
                 )}
               />
             </FieldGroup>
-            
 
             <FieldGroup>
               <Field>

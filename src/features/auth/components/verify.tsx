@@ -9,34 +9,24 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Field, FieldGroup } from "@/components/ui/field";
-
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/navigation";
-import { sendRequest } from "@/utils/api";
-import { checkCode } from "@/services/auth.service";
-
-const formSchema = z.object({
-  _id: z.string(),
-  code: z.string().min(6, "Code must be 6 digits"),
-});
-
-type FormValues = z.infer<typeof formSchema>;
+import { checkCode } from "../services";
+import { verifyLoginSchema, verifyLoginValues } from "../constants";
 
 export default function VerifyForm(props: any) {
   const { _id, email } = props;
   const router = useRouter();
 
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
+  const form = useForm<verifyLoginValues>({
+    resolver: zodResolver(verifyLoginSchema),
     defaultValues: {
       _id,
       code: "",
@@ -49,7 +39,7 @@ export default function VerifyForm(props: any) {
     formState: { isSubmitting },
   } = form;
 
-  async function onSubmit(values: FormValues) {
+  async function onSubmit(values: verifyLoginValues) {
     const res = await checkCode({
       _id: values._id,
       code: values.code,

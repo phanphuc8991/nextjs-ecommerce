@@ -1,4 +1,4 @@
-import Verify from "@/components/auth/verify";
+import Verify from "@/features/auth/components/verify";
 
 const VerifyPage = async ({
   params,

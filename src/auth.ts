@@ -1,8 +1,9 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { loginGoogle, loginUser } from "@/services/auth.service";
 import GoogleProvider from "next-auth/providers/google";
-import { ResponseUserLogin } from "./types/backend";
+import { ResponseUserLogin } from "./features/auth/next-auth";
+import { loginGoogle, loginUser } from "./features/auth/services";
+
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [

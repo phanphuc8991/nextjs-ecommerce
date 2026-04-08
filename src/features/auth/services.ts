@@ -1,6 +1,9 @@
 
-import { ApiResponse, ResponseUserLogin, LoginInput } from "@/types/backend";
+
 import { sendRequest } from "@/utils/api";
+
+import { ApiResponse } from "@/types/backend";
+import { LoginInput, ResponseUserLogin } from "./next-auth";
 
 export const registerUser = async (payload: {
   name: string;

@@ -12,16 +12,17 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogTitle } from "../ui/dialog";
-import { checkCode, resendActivation } from "@/services/auth.service";
-import { Button } from "../ui/button";
-import { Spinner } from "../ui/spinner";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import {
   InputOTP,
   InputOTPGroup,
   InputOTPSeparator,
   InputOTPSlot,
-} from "../ui/input-otp";
+} from "@/components/ui/input-otp";
+import { checkCode, resendActivation } from "../services";
 
 const stepper = defineStepper(
   { id: "login", label: "Login", icon: User },

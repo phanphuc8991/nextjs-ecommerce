@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -16,38 +15,21 @@ import {
   FieldSeparator,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { authenticate } from "@/utils/actions";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { routes } from "@/routes";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
-import ResendEmailModal from "./resend-email-modal";
 import { AUTH_ERROR_MESSAGES } from "@/utils/errors";
 import { signIn } from "next-auth/react";
+import { authenticate } from "../actions";
+import ResendEmailModal from "./resend-email-modal";
+import { loginSchema, LoginValues } from "../constants";
 
-const loginSchema = z.object({
-  email: z
-    .email("Please enter a valid email")
-    .trim()
-    .min(1, "Please enter your email"),
-  password: z
-    .string()
-    .trim()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(
-      /[^A-Za-z0-9]/,
-      "Password must contain at least one special character",
-    ),
-});
 
-type LoginValues = z.infer<typeof loginSchema>;
+
 
 export default function LoginForm() {
   const router = useRouter();
