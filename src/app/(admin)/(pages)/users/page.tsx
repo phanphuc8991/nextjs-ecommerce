@@ -44,9 +44,7 @@ export default async function Users() {
     <div>
       <div className="flex justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Users</h1>
-        
         <AddUser/>
-       
       </div>
       <div>{/* <TableData /> */}</div>
       <div className="container mx-auto py-10">

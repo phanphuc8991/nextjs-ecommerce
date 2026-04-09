@@ -1,11 +1,10 @@
 import LoginForm from "@/features/auth/components/login-form";
 
 
-
 const LoginPage = async () => {
   return (
     <div>
-      <LoginForm />
+      <LoginForm/>
     </div>
   );
 };

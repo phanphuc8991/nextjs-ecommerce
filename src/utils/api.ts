@@ -43,7 +43,9 @@ export const sendRequest = async <T = any>(
       statusCode: response.status,
     };
   } catch (error: any) {
+   
     if (axios.isAxiosError(error)) {
+
       const { response } = error;
       if (!response) {
         const message =
@@ -53,6 +55,15 @@ export const sendRequest = async <T = any>(
           statusCode: 0,
           message,
           raw: error,
+        };
+      }
+      if(`${error.status}` === '403'){
+
+         return {
+          success: false,
+          statusCode: 0,
+          message: response.data.message,
+          raw: response.data,
         };
       }
       const message = response.data?.message || "UNKNOWN_ERROR";

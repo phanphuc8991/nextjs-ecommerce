@@ -1,9 +1,9 @@
-import NextAuth from "next-auth";
+import NextAuth, { User } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { ResponseUserLogin } from "./features/auth/next-auth";
 import { loginGoogle, loginUser } from "./features/auth/services";
-
+import { CustomAuthError } from "./utils/errors";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -13,26 +13,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
     Credentials({
       authorize: async (credentials) => {
-        try {
-          if (
-            !credentials ||
-            typeof credentials.email !== "string" ||
-            typeof credentials.password !== "string"
-          )
-            return null;
-          const res = await loginUser({
-            email: credentials.email,
-            password: credentials.password,
-          });
-          if (res.success) {
-            return res.data;
-          } else {
-            throw new Error(res.message);
-          }
-        } catch (err) {
-          const error = err as string;
-          throw new Error(error);
+        if (
+          !credentials ||
+          typeof credentials.email !== "string" ||
+          typeof credentials.password !== "string"
+        )
+          return null;
+        const res = await loginUser({
+          email: credentials.email,
+          password: credentials.password,
+        });
+        if (!res.success) {
+          throw new CustomAuthError("", res.raw.type, res.raw.message);
         }
+        return res as User;
       },
     }),
   ],

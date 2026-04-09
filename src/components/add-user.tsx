@@ -95,7 +95,6 @@ export default function AddUser(props: any) {
     clearErrors,
     formState: { errors, isSubmitting },
   } = form;
-  console.log("errors", errors);
   const handleClick = () => {
     inputRef.current?.click();
   };
@@ -112,7 +111,6 @@ export default function AddUser(props: any) {
 
   async function onSubmit(values: any) {
     clearErrors("root");
-    console.log("values", values);
     try {
       const formData = new FormData(); // Tạo FormData để gửi file + text
 
