@@ -150,7 +150,7 @@ const LoginForm = () => {
 
               {/* PASSWORD */}
               <FieldGroup className="mb-6">
-                <PasswordField control={control} clearErrors={clearErrors} />
+                <PasswordField name='password' label="Password" control={control} clearErrors={clearErrors} />
               </FieldGroup>
               <Field>
                 <Button type="submit" disabled={isSubmitting}>

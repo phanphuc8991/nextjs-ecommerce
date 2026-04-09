@@ -21,17 +21,17 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import PasswordInput from "@/components/ui/password-input";
 import { useRouter } from "next/navigation";
-
-import { AUTH_ERROR_MESSAGES } from "@/utils/errors";
 import { registerUser } from "../services";
 import { signUpSchema, SignUpValues } from "../constants";
+import PasswordField from "@/components/PasswordField";
 
-export default function SignupForm(props: any) {
+const SignupForm = () => {
   const router = useRouter();
   const form = useForm<SignUpValues>({
     resolver: zodResolver(signUpSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
       password: "",
       confirmPassword: "",
@@ -46,73 +46,72 @@ export default function SignupForm(props: any) {
   } = form;
 
   async function onSubmit(values: SignUpValues) {
-    clearErrors("root");
-    try {
-      const res = await registerUser({
-        name: values.name,
-        email: values.email,
-        password: values.password,
-      });
-
-      if (res?._id) {
-        console.log;
-        const encodedEmail = btoa(res?.data?.email);
-        router.push(
-          `/verify/${res.data._id}?e=${encodeURIComponent(encodedEmail)}`,
-        );
-      }
-    } catch (err: any) {
-      console.log("err", err);
-      const errorCode = err?.error;
-      setError("root", {
-        type: "manual",
-        message: AUTH_ERROR_MESSAGES[errorCode] || "Something went wrong",
-      });
-    }
+    // clearErrors("root");
+    // try {
+    //   const res = await registerUser({
+    //     name: values.name,
+    //     email: values.email,
+    //     password: values.password,
+    //   });
+    //   if (res?._id) {
+    //     console.log;
+    //     const encodedEmail = btoa(res?.data?.email);
+    //     router.push(
+    //       `/verify/${res.data._id}?e=${encodeURIComponent(encodedEmail)}`,
+    //     );
+    //   }
+    // } catch (err: any) {
+    //   console.log("err", err);
+    //   const errorCode = err?.error;
+    //   setError("root", {
+    //     type: "manual",
+    //     message: AUTH_ERROR_MESSAGES[errorCode] || "Something went wrong",
+    //   });
+    // }
   }
 
-  return (
-    <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
-      <Card className="w-full sm:max-w-md">
-        <div className="relative">
-          <CardHeader>
-            <CardTitle>Create an account</CardTitle>
-            <CardDescription>
-              Enter your information below to create your account
-            </CardDescription>
-          </CardHeader>
-          {/*  (OVERLAY ERROR) */}
-          {errors.root && (
-            <div className="absolute inset-0 z-10 flex items-center justify-center bg-card px-6 animate-in fade-in zoom-in-95 duration-200">
-              <div className="w-full rounded-lg bg-destructive/10 p-3 border border-destructive/20 flex items-center justify-between gap-2">
-                <p className="text-sm font-medium text-destructive text-center w-full">
-                  {errors.root.message}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => clearErrors("root")}
-                  className="text-destructive hover:opacity-70"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-          )}
+  const FormError = ({ error, onClose }: any) => {
+    if (!error) return null;
+    return (
+      <div className="relative">
+        <div className="w-full rounded-lg bg-destructive/10 p-3 border border-destructive/20">
+          <div className="text-sm text-destructive text-center px-4">
+            {error.message}
+          </div>
+          <button
+            onClick={onClose}
+            className="absolute top-1 right-2 text-destructive"
+          >
+            ✕
+          </button>
         </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-3">
+      <Card className="w-full sm:max-w-md">
+        <CardHeader>
+          <CardTitle>Create an account</CardTitle>
+          <CardDescription>
+            Enter your information below to create your account
+          </CardDescription>
+        </CardHeader>
+        {/*  (OVERLAY ERROR) */}
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
-            {/* NAME */}
-            <FieldGroup className="mb-6">
+            <FieldGroup className="mb-4">
               <Controller
-                name="name"
+                name="firstName"
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Name</FieldLabel>
+                    <FieldLabel>First Name</FieldLabel>
                     <Input
                       {...field}
                       type="text"
-                      placeholder="John Doe"
+                      placeholder=""
                       aria-invalid={fieldState.invalid}
                       onChange={(e) => {
                         field.onChange(e);
@@ -127,16 +126,38 @@ export default function SignupForm(props: any) {
                 )}
               />
             </FieldGroup>
+            <FieldGroup className="mb-4">
+              <Controller
+                name="lastName"
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel>Last Name</FieldLabel>
+                    <Input
+                      {...field}
+                      type="text"
+                      placeholder=""
+                      aria-invalid={fieldState.invalid}
+                      onChange={(e) => {
+                        field.onChange(e);
+                        clearErrors("root");
+                      }}
+                    />
 
-            {/* EMAIL */}
-            <FieldGroup className="mb-6">
+                    {fieldState.error && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+            </FieldGroup>
+            <FieldGroup className="mb-4">
               <Controller
                 name="email"
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
                     <FieldLabel>Email</FieldLabel>
-
                     <Input
                       {...field}
                       type="email"
@@ -155,41 +176,22 @@ export default function SignupForm(props: any) {
                 )}
               />
             </FieldGroup>
-
-            {/* PASSWORD */}
-            <FieldGroup className="mb-6">
-              <Controller
+            <FieldGroup className="mb-4">
+              <PasswordField
+                label="Password"
                 name="password"
                 control={control}
-                render={({ field, fieldState }) => (
-                  <PasswordInput
-                    field={field}
-                    fieldState={fieldState}
-                    label="Password"
-                    onChange={(e: any) => {
-                      field.onChange(e);
-                      clearErrors("root");
-                    }}
-                  />
-                )}
+                clearErrors={clearErrors}
+                hideForgetPassWord={false}
               />
             </FieldGroup>
-
-            <FieldGroup className="mb-6">
-              <Controller
+            <FieldGroup className="mb-4">
+              <PasswordField
+                label="Confirm Password"
                 name="confirmPassword"
                 control={control}
-                render={({ field, fieldState }) => (
-                  <PasswordInput
-                    field={field}
-                    fieldState={fieldState}
-                    label="Confirm Password"
-                    onChange={(e: any) => {
-                      field.onChange(e);
-                      clearErrors("root");
-                    }}
-                  />
-                )}
+                clearErrors={clearErrors}
+                hideForgetPassWord={false}
               />
             </FieldGroup>
 
@@ -202,6 +204,10 @@ export default function SignupForm(props: any) {
                 >
                   {isSubmitting ? "Creating account..." : "Create Account"}
                 </Button>
+                <FormError
+                  error={errors.root}
+                  onClose={() => clearErrors("root")}
+                />
                 <Button variant="outline" type="button">
                   Sign up with Google
                 </Button>
@@ -216,4 +222,5 @@ export default function SignupForm(props: any) {
       </Card>
     </div>
   );
-}
+};
+export default SignupForm;

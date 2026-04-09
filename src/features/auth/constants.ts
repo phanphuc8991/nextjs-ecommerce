@@ -24,11 +24,17 @@ export type LoginValues = z.infer<typeof loginSchema>;
 
 export const signUpSchema = z
   .object({
-    name: z
+    firstName: z
       .string()
       .trim()
-      .min(2, "Name must be at least 2 characters")
-      .regex(/^[A-Za-z\s]+$/, "Name can only contain letters"),
+      .min(2, "First name must be at least 2 characters")
+      .regex(/^[A-Za-z\s]+$/, "First name can only contain letters"),
+
+    lastName: z
+      .string()
+      .trim()
+      .min(2, "Last name must be at least 2 characters")
+      .regex(/^[A-Za-z\s]+$/, "Last name can only contain letters"),
 
     email: z
       .email("Please enter a valid email")
@@ -44,7 +50,10 @@ export const signUpSchema = z
       .regex(/[0-9]/, "Password must contain number")
       .regex(/[^A-Za-z0-9]/, "Password must contain special character"),
 
-    confirmPassword: z.string().trim().min(1, "Please confirm your password"),
+    confirmPassword: z
+      .string()
+      .trim()
+      .min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",

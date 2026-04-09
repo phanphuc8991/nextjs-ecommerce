@@ -3,30 +3,34 @@ import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useState } from "react";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-import { LoginValues } from "@/features/auth/constants";
+import { LoginValues, SignUpValues } from "@/features/auth/constants";
 
 type Props = {
-  control: Control<LoginValues>;
-  clearErrors: UseFormClearErrors<LoginValues>;
+  control: Control<any>;
+  clearErrors: UseFormClearErrors<LoginValues> | UseFormClearErrors<SignUpValues>;
+  hideForgetPassWord?: boolean;
+  name: string;
+  label: string;
 };
 
-const PasswordField = ({ control, clearErrors }: Props) => {
+const PasswordField = ({ label, name, control, clearErrors, hideForgetPassWord = true }: Props) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <Controller
-      name="password"
+      name={name}
       control={control}
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid}>
           <div className="flex items-center">
-            <FieldLabel>Password</FieldLabel>
-
-            <a
-              href="#"
-              className="ml-auto text-sm underline-offset-4 hover:underline !text-black"
-            >
-              Forgot your password?
-            </a>
+            <FieldLabel>{label}</FieldLabel>
+            {hideForgetPassWord && (
+              <a
+                href="#"
+                className="ml-auto text-sm underline-offset-4 hover:underline !text-black"
+              >
+                Forgot your password?
+              </a>
+            )}
           </div>
           <div className="relative">
             <Input
