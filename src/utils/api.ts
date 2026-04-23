@@ -35,6 +35,7 @@ api.interceptors.response.use(
 export const sendRequest = async <T = any>(
   config: AxiosRequestConfig,
 ): Promise<ApiResponse<T>> => {
+
   try {
     const response = await api.request<T>(config);
     return {
@@ -43,9 +44,7 @@ export const sendRequest = async <T = any>(
       statusCode: response.status,
     };
   } catch (error: any) {
-   
     if (axios.isAxiosError(error)) {
-
       const { response } = error;
       if (!response) {
         const message =
@@ -58,7 +57,6 @@ export const sendRequest = async <T = any>(
         };
       }
       if(`${error.status}` === '403'){
-
          return {
           success: false,
           statusCode: 0,

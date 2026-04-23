@@ -15,23 +15,32 @@ import {
   FieldError,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
-
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { routes } from "@/routes";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
-import { useState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import { signIn } from "next-auth/react";
 import { authenticate } from "../actions";
 import ResendEmailModal from "./resend-email-modal";
 import { loginSchema, LoginValues } from "../constants";
 import PasswordField from "@/components/PasswordField";
+// import { useTranslations } from "next-intl";
+
+import {usePathname, useRouter} from 'next/navigation';
+
 const LoginForm = () => {
-  const router = useRouter();
+    const router = useRouter();
+  const pathname = usePathname();
+
+  const changeLang = (locale: string) => {
+    const newPath = `/${locale}${pathname.slice(3)}`;
+    router.push(newPath);
+  };
+
+  // const t = useTranslations("Login");
+  const [state, formAction, isPending] = useActionState(authenticate, null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -44,40 +53,19 @@ const LoginForm = () => {
     clearErrors("root");
     form.reset();
   };
-  const {
-    control,
-    handleSubmit,
-    setError,
-    clearErrors,
-    formState: { errors, isSubmitting },
-  } = form;
+  const { control, handleSubmit, clearErrors } = form;
 
-  async function onSubmit(values: LoginValues) {
-    clearErrors("root");
-    try {
-      const data = await authenticate(values.email, values.password);
-      if (data.success) {
-        router.push("/dashboard");
-      } else {
-        setError("root", {
-          type: data.type,
-          message: data.name,
-        });
-        if (data.type === "ACCOUNT_INACTIVE") {
-          setUserEmail(values.email);
-        }
-      }
-    } catch (error) {
-      setError("root", {
-        type: "manual",
-        message: "Something went wrong. Please try again.",
-      });
-    }
-  }
-
-  const FormError = ({ error, onClose, onActivate }: any) => {
+  const onSubmit = (data: LoginValues) => {
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value as string);
+    });
+    startTransition(() => {
+      formAction(formData);
+    });
+  };
+  const ServerError = ({ error, onActivate }: any) => {
     if (!error) return null;
-
     return (
       <div className="relative">
         <div className="w-full rounded-lg bg-destructive/10 p-3 border border-destructive/20">
@@ -93,12 +81,6 @@ const LoginForm = () => {
               error.message
             )}
           </div>
-          <button
-            onClick={onClose}
-            className="absolute top-1 right-2 text-destructive"
-          >
-            ✕
-          </button>
         </div>
       </div>
     );
@@ -109,12 +91,14 @@ const LoginForm = () => {
       <ResendEmailModal
         isModalOpen={isModalOpen}
         resetForm={resetForm}
-        userEmail={userEmail}
+        userEmail={state?.email}
       />
+        <button onClick={() => changeLang('vi')}>VI</button>
+      <button onClick={() => changeLang('en')}>EN</button>
       <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
         <Card className="w-full sm:max-w-md">
           <CardHeader>
-            <CardTitle>Login to your account</CardTitle>
+            {/* <CardTitle>{t("title")}</CardTitle> */}
             <CardDescription>
               Enter your email below to login to your account
             </CardDescription>
@@ -128,7 +112,6 @@ const LoginForm = () => {
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
                       <FieldLabel>Email</FieldLabel>
-
                       <Input
                         {...field}
                         type="email"
@@ -148,18 +131,22 @@ const LoginForm = () => {
                 />
               </FieldGroup>
 
-              {/* PASSWORD */}
               <FieldGroup className="mb-6">
-                <PasswordField name='password' label="Password" control={control} clearErrors={clearErrors} />
+                <PasswordField
+                  label="Password"
+                  name="password"
+                  control={control}
+                  clearErrors={clearErrors}
+                  hideForgetPassWord={false}
+                />
               </FieldGroup>
+
               <Field>
-                <Button type="submit" disabled={isSubmitting}>
-                  {" "}
-                  {isSubmitting ? "Logging in..." : "Login"}
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? "Logging in..." : "Login"}
                 </Button>
-                <FormError
-                  error={errors.root}
-                  onClose={() => clearErrors("root")}
+                <ServerError
+                  error={state?.error}
                   onActivate={() => setIsModalOpen(true)}
                 />
                 <Button

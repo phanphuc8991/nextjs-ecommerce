@@ -1,18 +1,24 @@
-
-
 import { sendRequest } from "@/utils/api";
 
 import { ApiResponse } from "@/types/backend";
-import { LoginInput, ResponseUserLogin } from "./next-auth";
+import { LoginInput, ResponseUserLogin, ResponseUserSignup, SignUpInput } from "./next-auth";
 
-export const registerUser = async (payload: {
-  name: string;
-  email: string;
-  password: any;
-}) => {
+export const loginUser = async (
+  payload: LoginInput,
+): Promise<ApiResponse<ResponseUserLogin>> => {
   return sendRequest({
-    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/register`,
     method: "POST",
+    url: "/api/v1/auth/login",
+    data: payload,
+  });
+};
+
+export const registerUser = async (
+  payload: SignUpInput,
+): Promise<ApiResponse<ResponseUserSignup>> => {
+  return sendRequest({
+    method: "POST",
+    url: "/api/v1/auth/register",
     data: payload,
   });
 };
@@ -33,19 +39,7 @@ export const resendActivation = async (payload: { email: string }) => {
   });
 };
 
-
-
-export const loginUser = async (payload: LoginInput):Promise<ApiResponse<ResponseUserLogin>> => {
-  return sendRequest({
-    method: "POST",
-    url: `/api/v1/auth/login`,
-    data: payload,
-  });
-};
-
-export const loginGoogle = async (payload: {
-  idToken: string;
-}) => {
+export const loginGoogle = async (payload: { idToken: string }) => {
   return sendRequest({
     method: "POST",
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/google-login`,

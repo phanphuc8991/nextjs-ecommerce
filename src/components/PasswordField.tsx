@@ -7,13 +7,21 @@ import { LoginValues, SignUpValues } from "@/features/auth/constants";
 
 type Props = {
   control: Control<any>;
-  clearErrors: UseFormClearErrors<LoginValues> | UseFormClearErrors<SignUpValues>;
+  clearErrors:
+    | UseFormClearErrors<LoginValues>
+    | UseFormClearErrors<SignUpValues>;
   hideForgetPassWord?: boolean;
   name: string;
   label: string;
 };
 
-const PasswordField = ({ label, name, control, clearErrors, hideForgetPassWord = true }: Props) => {
+const PasswordField = ({
+  label,
+  name,
+  control,
+  clearErrors,
+  hideForgetPassWord = true,
+}: Props) => {
   const [showPassword, setShowPassword] = useState(false);
   return (
     <Controller
@@ -49,9 +57,9 @@ const PasswordField = ({ label, name, control, clearErrors, hideForgetPassWord =
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
             >
               {showPassword ? (
-                <EyeSlashIcon className="h-5 w-5" />
-              ) : (
                 <EyeIcon className="h-5 w-5" />
+              ) : (
+                <EyeSlashIcon className="h-5 w-5" />
               )}
             </button>
           </div>

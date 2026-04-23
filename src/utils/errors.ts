@@ -16,5 +16,7 @@ export class CustomAuthError extends AuthError {
     this.name = "CustomAuthError";
     this.customType = customType;
     this.customName = customName;
+    Object.setPrototypeOf(this, CustomAuthError.prototype);
   }
+  
 }

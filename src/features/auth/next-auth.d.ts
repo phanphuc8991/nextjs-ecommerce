@@ -20,9 +20,23 @@ export interface ResponseUserLogin {
   access_token: string;
 }
 
+export interface ResponseUserSignup {
+  _id: string;
+  email: string;
+}
+
+
 export interface LoginInput {
   email: string;
   password: string;
+}
+
+export interface SignUpInput {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword?: string;
 }
 
 export interface LoginResponse {

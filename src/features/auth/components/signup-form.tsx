@@ -46,28 +46,32 @@ const SignupForm = () => {
   } = form;
 
   async function onSubmit(values: SignUpValues) {
-    // clearErrors("root");
-    // try {
-    //   const res = await registerUser({
-    //     name: values.name,
-    //     email: values.email,
-    //     password: values.password,
-    //   });
-    //   if (res?._id) {
-    //     console.log;
-    //     const encodedEmail = btoa(res?.data?.email);
-    //     router.push(
-    //       `/verify/${res.data._id}?e=${encodeURIComponent(encodedEmail)}`,
-    //     );
-    //   }
-    // } catch (err: any) {
-    //   console.log("err", err);
-    //   const errorCode = err?.error;
-    //   setError("root", {
-    //     type: "manual",
-    //     message: AUTH_ERROR_MESSAGES[errorCode] || "Something went wrong",
-    //   });
-    // }
+    clearErrors("root");
+    const { firstName, lastName, email, password } = values;
+
+    try {
+      const res = await registerUser({
+        firstName,
+        lastName,
+        email,
+        password,
+      });
+      console.log('res',res);
+      // if (res?._id) {
+      //   console.log;
+      //   const encodedEmail = btoa(res?.data?.email);
+      //   router.push(
+      //     `/verify/${res.data._id}?e=${encodeURIComponent(encodedEmail)}`,
+      //   );
+      // }
+    } catch (err: any) {
+      // console.log("err", err);
+      // const errorCode = err?.error;
+      // setError("root", {
+      //   type: "manual",
+      //   message: AUTH_ERROR_MESSAGES[errorCode] || "Something went wrong",
+      // });
+    }
   }
 
   const FormError = ({ error, onClose }: any) => {

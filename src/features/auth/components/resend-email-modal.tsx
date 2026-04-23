@@ -42,7 +42,7 @@ export const ResendEmailModal = ({
   resetForm,
 }: {
   isModalOpen: boolean;
-  userEmail: string;
+  userEmail?: string;
   resetForm: any;
 }) => {
   return (
@@ -77,7 +77,7 @@ const ResendContent = (props: any) => {
     try {
       setIsLoading(true);
       const res = await resendActivation({
-        email: props.userEmail,
+        email: props?.userEmail,
       });
       if (res) {
         setUserId(res.data?._id);
