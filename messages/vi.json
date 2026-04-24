@@ -1,5 +1,69 @@
 {
-  "Login": {
-    "title": "Đăng nhập tài khoản"
+  "auth": {
+    "login": {
+      "title": "Đăng nhập vào tài khoản của bạn",
+      "description": "Nhập email bên dưới để đăng nhập vào tài khoản",
+
+      "email": {
+        "label": "Email",
+        "placeholder": "m@example.com"
+      },
+
+      "password": {
+        "label": "Mật khẩu",
+        "placeholder": "Nhập mật khẩu của bạn"
+      },
+
+      "buttons": {
+        "login": "Đăng nhập",
+        "loginWithGoogle": "Đăng nhập với Google",
+        "loading": "Đang xử lý..."
+      },
+
+      "footer": {
+        "noAccount": "Bạn chưa có tài khoản?",
+        "signUp": "Đăng ký"
+      },
+
+      "errors": {
+        "inactive": "Tài khoản của bạn chưa được kích hoạt. Vui lòng",
+        "activate": "nhấn vào đây để kích hoạt",
+        "unauthorized": "Thông tin đăng nhập không đúng, bạn vui lòng thử lại.",
+        "unknown": "Đã xảy ra lỗi. Vui lòng thử lại.",
+        "validation": {
+          "email": {
+            "required": "Vui lòng nhập email",
+            "invalid": "Email không hợp lệ"
+          },
+
+          "password": {
+            "min": "Mật khẩu phải ít nhất 8 ký tự",
+            "uppercase": "Phải có ít nhất một chữ hoa",
+            "lowercase": "Phải có ít nhất một chữ thường",
+            "number": "Phải có ít nhất một chữ số",
+            "special": "Phải có ít nhất một ký tự đặc biệt",
+            "mismatch": "Mật khẩu không khớp"
+          },
+
+          "firstName": {
+            "min": "Tên phải ít nhất 2 ký tự",
+            "invalid": "Tên chỉ được chứa chữ cái"
+          },
+
+          "lastName": {
+            "min": "Họ phải ít nhất 2 ký tự",
+            "invalid": "Họ chỉ được chứa chữ cái"
+          },
+
+          "confirmPassword": {
+            "required": "Vui lòng xác nhận mật khẩu"
+          },
+
+          "code": {
+            "min": "Mã phải có 6 ký tự"
+          }
+        }
+      }
+    }
   }
 }

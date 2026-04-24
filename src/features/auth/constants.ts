@@ -1,72 +1,97 @@
-
 import * as z from "zod";
-export const loginSchema = z.object({
-  email: z
-    .email("Please enter a valid email")
-    .trim()
-    .min(1, "Please enter your email"),
-  password: z
-    .string()
-    .trim()
-    .min(8, "Password must be at least 8 characters")
-    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
-    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
-    .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(
-      /[^A-Za-z0-9]/,
-      "Password must contain at least one special character",
-    ),
-});
 
-export type LoginValues = z.infer<typeof loginSchema>;
+// i18n t function type
+export type TFunction = (key: string) => string;
 
-
-
-export const signUpSchema = z
-  .object({
-    firstName: z
-      .string()
-      .trim()
-      .min(2, "First name must be at least 2 characters")
-      .regex(/^[A-Za-z\s]+$/, "First name can only contain letters"),
-
-    lastName: z
-      .string()
-      .trim()
-      .min(2, "Last name must be at least 2 characters")
-      .regex(/^[A-Za-z\s]+$/, "Last name can only contain letters"),
-
+/**
+ * =========================
+ * LOGIN SCHEMA
+ * =========================
+ */
+export const createLoginSchema = (t: TFunction) =>
+  z.object({
     email: z
-      .email("Please enter a valid email")
+      .string()
       .trim()
-      .min(1, "Please enter your email"),
+      .min(1, t("auth.login.errors.validation.email.required"))
+      .email(t("auth.login.errors.validation.email.invalid")),
 
     password: z
       .string()
       .trim()
-      .min(8, "Password must be at least 8 characters")
-      .regex(/[A-Z]/, "Password must contain uppercase letter")
-      .regex(/[a-z]/, "Password must contain lowercase letter")
-      .regex(/[0-9]/, "Password must contain number")
-      .regex(/[^A-Za-z0-9]/, "Password must contain special character"),
-
-    confirmPassword: z
-      .string()
-      .trim()
-      .min(1, "Please confirm your password"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords do not match",
-    path: ["confirmPassword"],
+      .min(8, t("auth.login.errors.validation.password.min"))
+      .regex(/[A-Z]/, t("auth.login.errors.validation.password.uppercase"))
+      .regex(/[a-z]/, t("auth.login.errors.validation.password.lowercase"))
+      .regex(/[0-9]/, t("auth.login.errors.validation.password.number"))
+      .regex(
+        /[^A-Za-z0-9]/,
+        t("auth.login.errors.validation.password.special")
+      ),
   });
 
-export type SignUpValues = z.infer<typeof signUpSchema>;
+export type LoginValues = z.infer<ReturnType<typeof createLoginSchema>>;
 
+/**
+ * =========================
+ * SIGN UP SCHEMA
+ * =========================
+ */
+export const createSignUpSchema = (t: TFunction) =>
+  z
+    .object({
+      firstName: z
+        .string()
+        .trim()
+        .min(2, t("auth.login.errors.validation.firstName.min"))
+        .regex(/^[A-Za-z\s]+$/, t("auth.login.errors.validation.firstName.invalid")),
 
+      lastName: z
+        .string()
+        .trim()
+        .min(2, t("auth.login.errors.validation.lastName.min"))
+        .regex(/^[A-Za-z\s]+$/, t("auth.login.errors.validation.lastName.invalid")),
 
-export const verifyLoginSchema = z.object({
-  _id: z.string(),
-  code: z.string().min(6, "Code must be 6 digits"),
-});
+      email: z
+        .string()
+        .trim()
+        .min(1, t("auth.login.errors.validation.email.required"))
+        .email(t("auth.login.errors.validation.email.invalid")),
 
-export type verifyLoginValues = z.infer<typeof verifyLoginSchema>;
+      password: z
+        .string()
+        .trim()
+        .min(8, t("auth.login.errors.validation.password.min"))
+        .regex(/[A-Z]/, t("auth.login.errors.validation.password.uppercase"))
+        .regex(/[a-z]/, t("auth.login.errors.validation.password.lowercase"))
+        .regex(/[0-9]/, t("auth.login.errors.validation.password.number"))
+        .regex(
+          /[^A-Za-z0-9]/,
+          t("auth.login.errors.validation.password.special")
+        ),
+
+      confirmPassword: z
+        .string()
+        .trim()
+        .min(1, t("auth.login.errors.validation.confirmPassword.required")),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t("auth.login.errors.validation.password.mismatch"),
+      path: ["confirmPassword"],
+    });
+
+export type SignUpValues = z.infer<ReturnType<typeof createSignUpSchema>>;
+
+/**
+ * =========================
+ * VERIFY LOGIN SCHEMA (OTP / CODE)
+ * =========================
+ */
+export const createVerifyLoginSchema = (t: TFunction) =>
+  z.object({
+    _id: z.string().min(1),
+    code: z.string().min(6, t("auth.login.errors.validation.code.min")),
+  });
+
+export type VerifyLoginValues = z.infer<
+  ReturnType<typeof createVerifyLoginSchema>
+>;
