@@ -5,8 +5,20 @@ import { auth } from "@/auth";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
+
+function isVerifyPath(pathname: string) {
+  const localePattern = routing.locales.join("|");
+  const regex = new RegExp(`^(/(${localePattern}))?/verify/[^/]+$`);
+  return regex.test(pathname);
+}
+
 // Helper check public route
 function isPublicPath(pathname: string) {
+  if (isVerifyPath(pathname)) {
+    return true;
+  }
+  
+  // 2. Kiểm tra các public pages khác
   const publicRegex = new RegExp(
     `^(/(${routing.locales.join("|")}))?(${publicPages
       .flatMap((p) => (p === "/" ? ["", "/"] : p))
@@ -18,9 +30,9 @@ function isPublicPath(pathname: string) {
 }
 
 export default auth((req) => {
-  const { pathname, search } = req.nextUrl;
-
-  // Skip NextAuth API routes  (avoid redirect loop)
+  const { pathname } = req.nextUrl;
+  
+  // Skip NextAuth API routes (avoid redirect loop)
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
@@ -37,19 +49,12 @@ export default auth((req) => {
     return NextResponse.redirect(new URL("/auth/login", req.url));
   }
 
-  // Aready logged in -> allow access and handle locale
+  // Already logged in -> allow access and handle locale
   return intlMiddleware(req);
 });
 
 export const config = {
   matcher: [
-    /*
-     * Apply to all routes except:
-     * - API
-     * - static files
-     * - images
-     * - favicon
-     */
     "/((?!api|_next/static|_next/image|favicon.ico).*)",
   ],
 };

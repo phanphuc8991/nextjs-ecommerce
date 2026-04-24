@@ -108,5 +108,30 @@
         "min": "Code must be 6 digits"
       }
     }
+  },
+  "verify": {
+    "title": "Enter Verification Code",
+    "description": "We've sent a code to {email}",
+
+    "code": {
+      "label": "Verification Code"
+    },
+
+    "buttons": {
+      "submit": "Verify",
+      "loading": "Verifying..."
+    },
+
+    "errors": {
+      "invalidId": "Invalid session. Click <resend>here</resend> to log in again.",
+      "invalidCode": "That code doesn’t look right. Please try again.",
+      "codeExperid": "This code has expired. Please click <resend>Resend</resend> to get a new one.",
+      "unknown": "Something went wrong. Please try again."
+    },
+    "validation": {
+      "code": "Code must be 6 digits"
+    }
   }
 }
+
+

@@ -2,11 +2,6 @@ import * as z from "zod";
 
 export type TFunction = (key: string) => string;
 
-/**
- * =========================
- * LOGIN SCHEMA
- * =========================
- */
 export const createLoginSchema = (t: TFunction) =>
   z.object({
     email: z
@@ -27,11 +22,6 @@ export const createLoginSchema = (t: TFunction) =>
 
 export type LoginValues = z.infer<ReturnType<typeof createLoginSchema>>;
 
-/**
- * =========================
- * SIGN UP SCHEMA
- * =========================
- */
 export const createSignUpSchema = (t: TFunction) =>
   z
     .object({
@@ -74,16 +64,11 @@ export const createSignUpSchema = (t: TFunction) =>
 
 export type SignUpValues = z.infer<ReturnType<typeof createSignUpSchema>>;
 
-/**
- * =========================
- * VERIFY LOGIN SCHEMA (OTP / CODE)
- * =========================
- */
 export const createVerifyLoginSchema = (t: TFunction) =>
   z.object({
-    _id: z.string().min(1),
+    _id: z.string(),
 
-    code: z.string().min(6, t("auth.validation.code.min")),
+    code: z.string().min(6, t("verify.validation.code")),
   });
 
 export type VerifyLoginValues = z.infer<

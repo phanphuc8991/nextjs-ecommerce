@@ -34,7 +34,6 @@
       }
     },
     "signup": {
-
       "title": "Tạo tài khoản",
       "description": "Nhập thông tin của bạn bên dưới để tạo tài khoản",
 
@@ -79,6 +78,7 @@
         "emailAlreadyExists": "Email này đã được sử dụng. Vui lòng chọn email khác"
       }
     },
+
     "validation": {
       "email": {
         "required": "Vui lòng nhập email",
@@ -111,6 +111,28 @@
       "code": {
         "min": "Mã phải gồm 6 chữ số"
       }
+    }
+  },
+  "verify": {
+    "title": "Nhập mã xác minh",
+    "description": "Chúng tôi đã gửi mã đến {email}",
+    "fields": {
+      "code": {
+        "label": "Mã xác minh"
+      }
+    },
+    "buttons": {
+      "submit": "Xác minh",
+      "loading": "Đang xác minh..."
+    },
+    "errors": {
+      "invalidId": "Phiên không hợp lệ. Nhấn vào <resend>đây</resend>  để đăng nhập lại.",
+      "invalidCode": "Mã xác thực không đúng. Vui lòng thử lại.",
+      "codeExpired": "Mã này đã hết hạn. Vui lòng nhấn <resend>Gửi lại mã</resend> để nhận mã mới.",
+      "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại."
+    },
+    "validation": {
+      "code": "Mã phải gồm 6 chữ số"
     }
   }
 }

@@ -86,7 +86,10 @@ const SignupForm = () => {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>{t("firstName.label")}<span className="text-red-500 -ml-2 -mt-1">*</span></FieldLabel>
+                    <FieldLabel>
+                      {t("firstName.label")}
+                      <span className="text-red-500 -ml-2 -mt-1">*</span>
+                    </FieldLabel>
 
                     <Input
                       {...field}
@@ -110,7 +113,10 @@ const SignupForm = () => {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>{t("lastName.label")}<span className="text-red-500 -ml-2 -mt-1">*</span></FieldLabel>
+                    <FieldLabel>
+                      {t("lastName.label")}
+                      <span className="text-red-500 -ml-2 -mt-1">*</span>
+                    </FieldLabel>
                     <Input
                       {...field}
                       onChange={(e) => {
@@ -133,7 +139,10 @@ const SignupForm = () => {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>{t("email.label")}<span className="text-red-500 -ml-2 -mt-1">*</span></FieldLabel>
+                    <FieldLabel>
+                      {t("email.label")}
+                      <span className="text-red-500 -ml-2 -mt-1">*</span>
+                    </FieldLabel>
                     <Input
                       {...field}
                       type="email"
@@ -177,7 +186,7 @@ const SignupForm = () => {
                 {isPending ? t("buttons.loading") : t("buttons.signup")}
               </Button>
               <ServerError error={state?.error} />
-              <Button variant="outline" type="button">
+              <Button variant="outline" type="button" disabled={true}>
                 {t("buttons.googleSignup")}
               </Button>
 

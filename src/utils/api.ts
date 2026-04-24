@@ -36,10 +36,10 @@ export const sendRequest = async <T = any>(
   config: AxiosRequestConfig,
 ): Promise<ApiResponse<T>> => {
   try {
-    const response = await api.request<T>(config);
+    const response: any = await api.request<T>(config);
     return {
       success: true,
-      data: response.data,
+      data: response?.data?.data,
       statusCode: response.status,
     };
   } catch (error: any) {

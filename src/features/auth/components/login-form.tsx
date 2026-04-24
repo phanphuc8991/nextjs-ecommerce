@@ -190,6 +190,7 @@ const LoginForm = () => {
                   onClick={() => signIn("google", { callbackUrl: "/" })}
                   variant="outline"
                   type="button"
+                  disabled={true}
                 >
                   {t("buttons.loginWithGoogle")}
                 </Button>
