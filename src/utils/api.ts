@@ -35,7 +35,6 @@ api.interceptors.response.use(
 export const sendRequest = async <T = any>(
   config: AxiosRequestConfig,
 ): Promise<ApiResponse<T>> => {
-
   try {
     const response = await api.request<T>(config);
     return {
@@ -44,6 +43,7 @@ export const sendRequest = async <T = any>(
       statusCode: response.status,
     };
   } catch (error: any) {
+    console.log("error", error);
     if (axios.isAxiosError(error)) {
       const { response } = error;
       if (!response) {
@@ -56,21 +56,15 @@ export const sendRequest = async <T = any>(
           raw: error,
         };
       }
-      if(`${error.status}` === '403'){
-         return {
+      if (`${error.status}` === "403" || `${error.status}` === "400") {
+        const message = response.data?.message || "UNKNOWN_ERROR";
+        return {
           success: false,
-          statusCode: 0,
-          message: response.data.message,
+          statusCode: error.status as  number,
+          message: message,
           raw: response.data,
         };
       }
-      const message = response.data?.message || "UNKNOWN_ERROR";
-      return {
-        success: false,
-        statusCode: response.status,
-        message,
-        raw: response.data,
-      };
     }
     return {
       success: false,

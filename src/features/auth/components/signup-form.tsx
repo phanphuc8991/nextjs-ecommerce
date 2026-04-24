@@ -19,16 +19,20 @@ import { routes } from "@/routes";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import PasswordInput from "@/components/ui/password-input";
-import { useRouter } from "next/navigation";
-import { registerUser } from "../services";
-import { signUpSchema, SignUpValues } from "../constants";
+import { createSignUpSchema, SignUpValues } from "../constants";
 import PasswordField from "@/components/PasswordField";
-
+import { useTranslations, useLocale } from "next-intl";
+import { startTransition, useActionState } from "react";
+import { toFormData } from "@/lib/toFormData";
+import { register } from "../actions";
+import { ServerErrorProps } from "../next-auth";
 const SignupForm = () => {
-  const router = useRouter();
+  const t = useTranslations("auth.signup");
+  const tValidation = useTranslations();
+  const schema = createSignUpSchema(tValidation);
+  const [state, formAction, isPending] = useActionState(register, null);
   const form = useForm<SignUpValues>({
-    resolver: zodResolver(signUpSchema),
+    resolver: zodResolver(schema),
     defaultValues: {
       firstName: "",
       lastName: "",
@@ -37,72 +41,43 @@ const SignupForm = () => {
       confirmPassword: "",
     },
   });
-  const {
-    control,
-    handleSubmit,
-    setError,
-    clearErrors,
-    formState: { errors, isSubmitting },
-  } = form;
-
-  async function onSubmit(values: SignUpValues) {
-    clearErrors("root");
-    const { firstName, lastName, email, password } = values;
-
-    try {
-      const res = await registerUser({
-        firstName,
-        lastName,
-        email,
-        password,
-      });
-      console.log('res',res);
-      // if (res?._id) {
-      //   console.log;
-      //   const encodedEmail = btoa(res?.data?.email);
-      //   router.push(
-      //     `/verify/${res.data._id}?e=${encodeURIComponent(encodedEmail)}`,
-      //   );
-      // }
-    } catch (err: any) {
-      // console.log("err", err);
-      // const errorCode = err?.error;
-      // setError("root", {
-      //   type: "manual",
-      //   message: AUTH_ERROR_MESSAGES[errorCode] || "Something went wrong",
-      // });
-    }
+  const { control, handleSubmit, clearErrors } = form;
+  async function onSubmit(data: SignUpValues) {
+    const formData = toFormData(data);
+    startTransition(() => {
+      formAction(formData);
+    });
   }
 
-  const FormError = ({ error, onClose }: any) => {
+  const ServerError = ({ error }: ServerErrorProps) => {
     if (!error) return null;
+    const renderError = () => {
+      switch (error.type) {
+        case "EMAIL_ALREADY_EXISTS":
+          return <span>{t("errors.emailAlreadyExists")}</span>;
+        default:
+          return <span>{t("errors.unknown")}</span>;
+      }
+    };
     return (
       <div className="relative">
         <div className="w-full rounded-lg bg-destructive/10 p-3 border border-destructive/20">
           <div className="text-sm text-destructive text-center px-4">
-            {error.message}
+            {renderError()}
           </div>
-          <button
-            onClick={onClose}
-            className="absolute top-1 right-2 text-destructive"
-          >
-            ✕
-          </button>
         </div>
       </div>
     );
   };
 
   return (
-    <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-3">
+    <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
       <Card className="w-full sm:max-w-md">
         <CardHeader>
-          <CardTitle>Create an account</CardTitle>
-          <CardDescription>
-            Enter your information below to create your account
-          </CardDescription>
+          <CardTitle>{t("title")}</CardTitle>
+          <CardDescription>{t("description")}</CardDescription>
         </CardHeader>
-        {/*  (OVERLAY ERROR) */}
+
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <FieldGroup className="mb-4">
@@ -111,12 +86,10 @@ const SignupForm = () => {
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>First Name</FieldLabel>
+                    <FieldLabel>{t("firstName.label")}<span className="text-red-500 -ml-2 -mt-1">*</span></FieldLabel>
+
                     <Input
                       {...field}
-                      type="text"
-                      placeholder=""
-                      aria-invalid={fieldState.invalid}
                       onChange={(e) => {
                         field.onChange(e);
                         clearErrors("root");
@@ -130,18 +103,16 @@ const SignupForm = () => {
                 )}
               />
             </FieldGroup>
+
             <FieldGroup className="mb-4">
               <Controller
                 name="lastName"
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Last Name</FieldLabel>
+                    <FieldLabel>{t("lastName.label")}<span className="text-red-500 -ml-2 -mt-1">*</span></FieldLabel>
                     <Input
                       {...field}
-                      type="text"
-                      placeholder=""
-                      aria-invalid={fieldState.invalid}
                       onChange={(e) => {
                         field.onChange(e);
                         clearErrors("root");
@@ -155,18 +126,18 @@ const SignupForm = () => {
                 )}
               />
             </FieldGroup>
+
             <FieldGroup className="mb-4">
               <Controller
                 name="email"
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel>Email</FieldLabel>
+                    <FieldLabel>{t("email.label")}<span className="text-red-500 -ml-2 -mt-1">*</span></FieldLabel>
                     <Input
                       {...field}
                       type="email"
-                      placeholder="m@example.com"
-                      aria-invalid={fieldState.invalid}
+                      placeholder={t("email.placeholder")}
                       onChange={(e) => {
                         field.onChange(e);
                         clearErrors("root");
@@ -180,18 +151,20 @@ const SignupForm = () => {
                 )}
               />
             </FieldGroup>
+
             <FieldGroup className="mb-4">
               <PasswordField
-                label="Password"
+                label={t("password.label")}
                 name="password"
                 control={control}
                 clearErrors={clearErrors}
                 hideForgetPassWord={false}
               />
             </FieldGroup>
+
             <FieldGroup className="mb-4">
               <PasswordField
-                label="Confirm Password"
+                label={t("confirmPassword.label")}
                 name="confirmPassword"
                 control={control}
                 clearErrors={clearErrors}
@@ -199,32 +172,25 @@ const SignupForm = () => {
               />
             </FieldGroup>
 
-            <FieldGroup>
-              <Field>
-                <Button
-                  type="submit"
-                  className="w-full"
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Creating account..." : "Create Account"}
-                </Button>
-                <FormError
-                  error={errors.root}
-                  onClose={() => clearErrors("root")}
-                />
-                <Button variant="outline" type="button">
-                  Sign up with Google
-                </Button>
-                <FieldDescription className="px-6 text-center">
-                  Already have an account?{" "}
-                  <Link href={routes.login}>Sign in</Link>
-                </FieldDescription>
-              </Field>
-            </FieldGroup>
+            <Field>
+              <Button type="submit" className="w-full" disabled={isPending}>
+                {isPending ? t("buttons.loading") : t("buttons.signup")}
+              </Button>
+              <ServerError error={state?.error} />
+              <Button variant="outline" type="button">
+                {t("buttons.googleSignup")}
+              </Button>
+
+              <FieldDescription className="text-center">
+                {t("footer.alreadyHaveAccount")}{" "}
+                <Link href={routes.login}>{t("footer.signIn")}</Link>
+              </FieldDescription>
+            </Field>
           </form>
         </CardContent>
       </Card>
     </div>
   );
 };
+
 export default SignupForm;

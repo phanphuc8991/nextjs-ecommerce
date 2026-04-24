@@ -1,6 +1,5 @@
 import * as z from "zod";
 
-// i18n t function type
 export type TFunction = (key: string) => string;
 
 /**
@@ -13,20 +12,17 @@ export const createLoginSchema = (t: TFunction) =>
     email: z
       .string()
       .trim()
-      .min(1, t("auth.login.errors.validation.email.required"))
-      .email(t("auth.login.errors.validation.email.invalid")),
+      .min(1, t("auth.validation.email.required"))
+      .email(t("auth.validation.email.invalid")),
 
     password: z
       .string()
       .trim()
-      .min(8, t("auth.login.errors.validation.password.min"))
-      .regex(/[A-Z]/, t("auth.login.errors.validation.password.uppercase"))
-      .regex(/[a-z]/, t("auth.login.errors.validation.password.lowercase"))
-      .regex(/[0-9]/, t("auth.login.errors.validation.password.number"))
-      .regex(
-        /[^A-Za-z0-9]/,
-        t("auth.login.errors.validation.password.special")
-      ),
+      .min(8, t("auth.validation.password.min"))
+      .regex(/[A-Z]/, t("auth.validation.password.uppercase"))
+      .regex(/[a-z]/, t("auth.validation.password.lowercase"))
+      .regex(/[0-9]/, t("auth.validation.password.number"))
+      .regex(/[^A-Za-z0-9]/, t("auth.validation.password.special")),
   });
 
 export type LoginValues = z.infer<ReturnType<typeof createLoginSchema>>;
@@ -42,40 +38,37 @@ export const createSignUpSchema = (t: TFunction) =>
       firstName: z
         .string()
         .trim()
-        .min(2, t("auth.login.errors.validation.firstName.min"))
-        .regex(/^[A-Za-z\s]+$/, t("auth.login.errors.validation.firstName.invalid")),
+        .min(2, t("auth.validation.firstName.min"))
+        .regex(/^[A-Za-z\s]+$/, t("auth.validation.firstName.invalid")),
 
       lastName: z
         .string()
         .trim()
-        .min(2, t("auth.login.errors.validation.lastName.min"))
-        .regex(/^[A-Za-z\s]+$/, t("auth.login.errors.validation.lastName.invalid")),
+        .min(2, t("auth.validation.lastName.min"))
+        .regex(/^[A-Za-z\s]+$/, t("auth.validation.lastName.invalid")),
 
       email: z
         .string()
         .trim()
-        .min(1, t("auth.login.errors.validation.email.required"))
-        .email(t("auth.login.errors.validation.email.invalid")),
+        .min(1, t("auth.validation.email.required"))
+        .email(t("auth.validation.email.invalid")),
 
       password: z
         .string()
         .trim()
-        .min(8, t("auth.login.errors.validation.password.min"))
-        .regex(/[A-Z]/, t("auth.login.errors.validation.password.uppercase"))
-        .regex(/[a-z]/, t("auth.login.errors.validation.password.lowercase"))
-        .regex(/[0-9]/, t("auth.login.errors.validation.password.number"))
-        .regex(
-          /[^A-Za-z0-9]/,
-          t("auth.login.errors.validation.password.special")
-        ),
+        .min(8, t("auth.validation.password.min"))
+        .regex(/[A-Z]/, t("auth.validation.password.uppercase"))
+        .regex(/[a-z]/, t("auth.validation.password.lowercase"))
+        .regex(/[0-9]/, t("auth.validation.password.number"))
+        .regex(/[^A-Za-z0-9]/, t("auth.validation.password.special")),
 
       confirmPassword: z
         .string()
         .trim()
-        .min(1, t("auth.login.errors.validation.confirmPassword.required")),
+        .min(1, t("auth.validation.confirmPassword.required")),
     })
     .refine((data) => data.password === data.confirmPassword, {
-      message: t("auth.login.errors.validation.password.mismatch"),
+      message: t("auth.validation.confirmPassword.mismatch"),
       path: ["confirmPassword"],
     });
 
@@ -89,7 +82,8 @@ export type SignUpValues = z.infer<ReturnType<typeof createSignUpSchema>>;
 export const createVerifyLoginSchema = (t: TFunction) =>
   z.object({
     _id: z.string().min(1),
-    code: z.string().min(6, t("auth.login.errors.validation.code.min")),
+
+    code: z.string().min(6, t("auth.validation.code.min")),
   });
 
 export type VerifyLoginValues = z.infer<

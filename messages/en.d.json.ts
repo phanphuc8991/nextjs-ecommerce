@@ -20,7 +20,7 @@ declare const messages: {
       "buttons": {
         "login": "Login",
         "loginWithGoogle": "Login with Google",
-         "loading": "Loading..."
+        "loading": "Loading..."
       },
 
       "footer": {
@@ -29,44 +29,86 @@ declare const messages: {
       },
 
       "errors": {
-        "inactive": "Your account isn’t active yet. Please",
+        "inactive": "Your account has not been activated yet. Please",
         "activate": "click here to activate it",
         "unauthorized": "Incorrect email or password.",
-         "unknown": "Something went wrong. Please try again.",
+        "unknown": "Something went wrong. Please try again.",
+        "emailAlreadyExists": "Email already exists. Please use another email"
+      }
+    },
+    "signup": {
+      "title": "Create an account",
+      "description": "Enter your information below to create your account",
 
-        "validation": {
-          "email": {
-            "required": "Please enter your email",
-            "invalid": "Please enter a valid email"
-          },
+      "firstName": {
+        "label": "First Name",
+        "placeholder": ""
+      },
+      "lastName": {
+        "label": "Last Name",
+        "placeholder": ""
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "m@example.com"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": ""
+      },
+      "confirmPassword": {
+        "label": "Confirm Password",
+        "placeholder": ""
+      },
 
-          "password": {
-            "min": "Password must be at least 8 characters",
-            "uppercase": "Must contain at least one uppercase letter",
-            "lowercase": "Must contain at least one lowercase letter",
-            "number": "Must contain at least one number",
-            "special": "Must contain at least one special character",
-            "mismatch": "Passwords do not match"
-          },
+      "buttons": {
+        "signup": "Create Account",
+        "loading": "Creating account...",
+        "googleSignup": "Sign up with Google"
+      },
 
-          "firstName": {
-            "min": "First name must be at least 2 characters",
-            "invalid": "First name can only contain letters"
-          },
+      "footer": {
+        "alreadyHaveAccount": "Already have an account?",
+        "signIn": "Sign in"
+      },
 
-          "lastName": {
-            "min": "Last name must be at least 2 characters",
-            "invalid": "Last name can only contain letters"
-          },
+      "errors": {
+        "unknown": "Something went wrong. Please try again.",
+        "emailAlreadyExists": "Email already exists. Please use another email"
+      }
+    },
 
-          "confirmPassword": {
-            "required": "Please confirm your password"
-          },
+    "validation": {
+      "email": {
+        "required": "Please enter your email",
+        "invalid": "Please enter a valid email"
+      },
 
-          "code": {
-            "min": "Code must be 6 digits"
-          }
-        }
+      "password": {
+        "min": "Password must be at least 8 characters",
+        "uppercase": "Must contain at least one uppercase letter",
+        "lowercase": "Must contain at least one lowercase letter",
+        "number": "Must contain at least one number",
+        "special": "Must contain at least one special character"
+      },
+
+      "firstName": {
+        "min": "First name must be at least 2 characters",
+        "invalid": "First name can only contain letters"
+      },
+
+      "lastName": {
+        "min": "Last name must be at least 2 characters",
+        "invalid": "Last name can only contain letters"
+      },
+
+      "confirmPassword": {
+        "required": "Please confirm your password",
+        "mismatch": "Passwords do not match"
+      },
+
+      "code": {
+        "min": "Code must be 6 digits"
       }
     }
   }

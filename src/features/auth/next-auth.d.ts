@@ -46,4 +46,8 @@ export interface LoginResponse {
   refreshToken?: string;
   // ... các field khác
 }
-s
+
+export type ServerErrorProps = {
+  error?: { type: string; message?: string };
+  onActivate?: () => void;
+};

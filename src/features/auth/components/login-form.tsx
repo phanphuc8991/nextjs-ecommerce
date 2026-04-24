@@ -30,6 +30,8 @@ import PasswordField from "@/components/PasswordField";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter, usePathname } from "@/i18n/navigation";
 import Link from "next/link";
+import { ServerErrorProps } from "../next-auth";
+import { toFormData } from "@/lib/toFormData";
 
 const LoginForm = () => {
   const locale = useLocale();
@@ -37,11 +39,12 @@ const LoginForm = () => {
   const pathname = usePathname();
 
   const t = useTranslations("auth.login");
-  const tValidation = useTranslations(); // root for validation keys
+  const tValidation = useTranslations();
 
   const schema = createLoginSchema(tValidation);
 
   const [state, formAction, isPending] = useActionState(authenticate, null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const form = useForm<LoginValues>({
@@ -65,17 +68,13 @@ const LoginForm = () => {
   };
 
   const onSubmit = (data: LoginValues) => {
-    const formData = new FormData();
-
-    Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value as string);
-    });
-
+   const formData = toFormData(data);
     startTransition(() => {
       formAction(formData);
     });
   };
-  const ServerError = ({ error, onActivate }: any) => {
+
+  const ServerError = ({ error, onActivate }: ServerErrorProps) => {
     if (!error) return null;
 
     const renderError = () => {
@@ -94,7 +93,7 @@ const LoginForm = () => {
           return <span>{t("errors.unauthorized")}</span>;
 
         default:
-          return <span>{error.message || t("errors.unknown")}</span>;
+          return <span>{t("errors.unknown")}</span>;
       }
     };
 
@@ -143,14 +142,14 @@ const LoginForm = () => {
 
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)}>
+
               <FieldGroup className="mb-6">
                 <Controller
                   name="email"
                   control={control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel>{t("email.label")}</FieldLabel>
-
+                      <FieldLabel>{t("email.label")}<span className="text-red-500 -ml-2 -mt-1">*</span></FieldLabel>
                       <Input
                         {...field}
                         type="email"
@@ -161,7 +160,6 @@ const LoginForm = () => {
                           clearErrors("root");
                         }}
                       />
-
                       {fieldState.error && (
                         <FieldError errors={[fieldState.error]} />
                       )}
@@ -184,12 +182,10 @@ const LoginForm = () => {
                 <Button type="submit" disabled={isPending}>
                   {isPending ? t("buttons.loading") : t("buttons.login")}
                 </Button>
-
                 <ServerError
                   error={state?.error}
                   onActivate={() => setIsModalOpen(true)}
                 />
-
                 <Button
                   onClick={() => signIn("google", { callbackUrl: "/" })}
                   variant="outline"
@@ -197,7 +193,6 @@ const LoginForm = () => {
                 >
                   {t("buttons.loginWithGoogle")}
                 </Button>
-
                 <FieldDescription className="text-center">
                   {t("footer.noAccount")}{" "}
                   <Link href={routes.signup}>{t("footer.signUp")}</Link>

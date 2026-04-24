@@ -30,7 +30,7 @@ const PasswordField = ({
       render={({ field, fieldState }) => (
         <Field data-invalid={fieldState.invalid}>
           <div className="flex items-center">
-            <FieldLabel>{label}</FieldLabel>
+            <FieldLabel>{label} <span className="text-red-500 -ml-2 -mt-1">*</span></FieldLabel>
             {hideForgetPassWord && (
               <a
                 href="#"
