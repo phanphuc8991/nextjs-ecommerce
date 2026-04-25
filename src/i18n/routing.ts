@@ -2,7 +2,7 @@ import { defineRouting } from "next-intl/routing";
 
 export const routing = defineRouting({
   locales: ["vi", "en"],
-  defaultLocale: "vi",
+  defaultLocale: "en",
   localePrefix: "always", 
   pathnames: {
     "/": "/",
@@ -10,7 +10,7 @@ export const routing = defineRouting({
     "/dashboard": "/dashboard"
   },
 });
-export const publicPages = ["/","/auth/login",'/auth/signup','/verify'];
+export const publicPages = ["/","/auth",'/verify'];
 
 export type Pathnames = keyof typeof routing.pathnames;
 export type Locale = (typeof routing.locales)[number];

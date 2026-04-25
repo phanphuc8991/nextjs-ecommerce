@@ -37,7 +37,8 @@ export async function authenticate(
       email: type === "ACCOUNT_INACTIVE" ? email : undefined,
     };
   }
-  redirect("/dashboard");
+  const locale = await getLocale();
+  redirect(`/${locale}/dashboard`);
 }
 
 export async function register(

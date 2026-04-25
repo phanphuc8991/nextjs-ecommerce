@@ -87,7 +87,9 @@ export function SiteHeader() {
                   className="p-1 cursor-pointer"
                   onClick={async () => {
                     "use server";
-                    await signOut();
+                    await signOut({
+                      redirectTo: `/auth/login`,
+                    });
                   }}
                 >
                   <div className="flex gap-2 items-center py-1.5  px-2 hover:bg-[#e4e4e8] rounded-sm">

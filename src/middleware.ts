@@ -5,56 +5,54 @@ import { auth } from "@/auth";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
-
-function isVerifyPath(pathname: string) {
-  const localePattern = routing.locales.join("|");
-  const regex = new RegExp(`^(/(${localePattern}))?/verify/[^/]+$`);
-  return regex.test(pathname);
+function getLocaleFromPathname(pathname: string) {
+  const segments = pathname.split("/");
+  const locale = segments[1];
+  if (routing.locales.includes(locale as any)) {
+    return locale;
+  }
+  return routing.defaultLocale;
 }
 
-// Helper check public route
-function isPublicPath(pathname: string) {
-  if (isVerifyPath(pathname)) {
-    return true;
-  }
+function isPublicPage(pathname: string, locale: string) {
+  const regex = new RegExp(`^/${locale}(/|$)`);
+  const pathWithoutLocale = pathname.replace(regex, "/").replace(/\/$/, "") || "/";
   
-  // 2. Kiểm tra các public pages khác
-  const publicRegex = new RegExp(
-    `^(/(${routing.locales.join("|")}))?(${publicPages
-      .flatMap((p) => (p === "/" ? ["", "/"] : p))
-      .join("|")})/?$`,
-    "i",
-  );
 
-  return publicRegex.test(pathname);
+  return publicPages.some((pattern) => {
+    return (
+      pathWithoutLocale === pattern ||
+      pathWithoutLocale.startsWith(`${pattern}/`)
+    );
+  });
 }
 
 export default auth((req) => {
   const { pathname } = req.nextUrl;
-  
-  // Skip NextAuth API routes (avoid redirect loop)
+  const locale = getLocaleFromPathname(pathname);
+  const isLoggedin = !!req.auth;
+
   if (pathname.startsWith("/api/auth")) {
     return NextResponse.next();
   }
 
-  const isPublic = isPublicPath(pathname);
+  const isPublic = isPublicPage(pathname, locale);
 
-  // Public page → handle i18n only
-  if (isPublic) {
-    return intlMiddleware(req);
+ 
+  if (!isLoggedin && !isPublic) {
+    const loginUrl = new URL(`/${locale}/auth/login`, req.url);
+    return NextResponse.redirect(loginUrl);
   }
 
-  // ✅ 3. Private page → requires authentication 
-  if (!req.auth) {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+  const pathWithoutLocale = pathname.replace(new RegExp(`^/${locale}(/|$)`), "/").replace(/\/$/, "") || "/";
+  if (isLoggedin && pathWithoutLocale.startsWith("/auth/login")) {
+    return NextResponse.redirect(new URL(`/${locale}/dashboard`, req.url));
   }
 
-  // Already logged in -> allow access and handle locale
+ 
   return intlMiddleware(req);
 });
 
 export const config = {
-  matcher: [
-    "/((?!api|_next/static|_next/image|favicon.ico).*)",
-  ],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico).*)"],
 };
