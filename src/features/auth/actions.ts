@@ -1,15 +1,15 @@
 "use server";
 import { signIn } from "@/auth";
-import { routes } from "@/routes";
 import { CustomAuthError } from "@/utils/errors";
 import { redirect } from "next/navigation";
-import { checkCode, registerUser } from "./services";
+import { checkCode, registerUser, resendActivation } from "./services";
 import { getLocale } from "next-intl/server";
 
 type FormState = {
-  success?: boolean;
+  success: boolean;
   error?: { type: string; message: string };
   email?: string;
+  _id?: string;
 };
 
 export async function authenticate(
@@ -77,7 +77,35 @@ export async function register(
     };
   }
   const locale = await getLocale();
- redirect(`/${locale}/auth/verify?id=${id}&e=${encodeURIComponent(encodedEmail)}`);
+  redirect(
+    `/${locale}/auth/verify?id=${id}&e=${encodeURIComponent(encodedEmail)}`,
+  );
+}
+
+export async function resend(email: string): Promise<FormState> {
+  try {
+    const res = await resendActivation({ email });
+    console.log("ressss", res);
+    if (res.success) {
+      return {
+        success: true,
+        _id: res.data._id,
+      };
+    } else {
+      throw new CustomAuthError("", res.raw.type, res.raw.message);
+    }
+  } catch (error) {
+    let type = "MANUAL";
+    let message = "Something went wrong. Please try again.";
+    if (error instanceof CustomAuthError) {
+      type = error.customType || type;
+      message = error.customName || message;
+    }
+    return {
+      success: false,
+      error: { type, message },
+    };
+  }
 }
 
 export async function verify(
@@ -86,14 +114,13 @@ export async function verify(
 ): Promise<FormState> {
   const _id = formData.get("_id") as string;
   const code = formData.get("code") as string;
-  console.log('_id',_id);
+
   try {
     const res = await checkCode({
       _id,
       code,
     });
     if (!res.success) {
-      console.log('res',res);
       throw new CustomAuthError("", res.raw.type, res.raw.message);
     }
   } catch (error) {
@@ -110,4 +137,38 @@ export async function verify(
   }
   const locale = await getLocale();
   redirect(`/${locale}/auth/login`);
+}
+
+export async function reVerify(
+  preveState: FormState | null,
+  formData: FormData,
+): Promise<FormState> {
+  const _id = formData.get("_id") as string;
+  const code = formData.get("code") as string;
+
+  try {
+    const res = await checkCode({
+      _id,
+      code,
+    });
+    console.log('ressss',res);
+    if (res.success) {
+      return {
+        success: true,
+      };
+    } else {
+      throw new CustomAuthError("", res.raw.type, res.raw.message);
+    }
+  } catch (error) {
+    let type = "MANUAL";
+    let message = "Something went wrong. Please try again.";
+    if (error instanceof CustomAuthError) {
+      type = error.customType || type;
+      message = error.customName || message;
+    }
+    return {
+      success: false,
+      error: { type, message },
+    };
+  }
 }

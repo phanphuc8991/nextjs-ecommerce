@@ -20,17 +20,6 @@ export interface ResponseUserLogin {
   access_token: string;
 }
 
-export interface ResponseUserSignup {
-  _id: string;
-  email: string;
-}
-
-
-export interface LoginInput {
-  email: string;
-  password: string;
-}
-
 export interface SignUpInput {
   firstName: string;
   lastName: string;
@@ -40,14 +29,17 @@ export interface SignUpInput {
 }
 
 export interface LoginResponse {
-  // cấu trúc response từ loginUser / loginGoogle của bạn
   user: BackendUser;
   accessToken?: string;
   refreshToken?: string;
-  // ... các field khác
 }
 
 export type ServerErrorProps = {
   error?: { type: string; message?: string };
   onActivate?: () => void;
 };
+
+export type CustomError =  {
+  type: string;
+  message: string;
+}

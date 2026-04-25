@@ -131,7 +131,28 @@
     "validation": {
       "code": "Code must be 6 digits"
     }
+  },
+  "ResendEmail": {
+    "steps": {
+      "login": "Sign In",
+      "verification": "Verification",
+      "done": "Done"
+    },
+    "login": {
+      "title": "Activate your account.",
+      "email_label": "Email",
+      "resend_btn": "Resend code",
+      "resending_btn": "Resending..."
+    },
+    "verification": {
+      "title": "Please enter the verification code.",
+      "code_label": "Code",
+      "activate_btn": "Activate",
+      "activating_btn": "Activating..."
+    },
+    "done": {
+      "message": "Great! Your account has been activated. You can start using it right away.",
+      "close_btn": "Close"
+    }
   }
 }
-
-

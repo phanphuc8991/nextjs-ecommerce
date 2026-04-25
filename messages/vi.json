@@ -134,5 +134,28 @@
     "validation": {
       "code": "Mã phải gồm 6 chữ số"
     }
+  },
+  "ResendEmail": {
+    "steps": {
+      "login": "Đăng nhập",
+      "verification": "Xác minh",
+      "done": "Hoàn tất"
+    },
+    "login": {
+      "title": "Kích hoạt tài khoản của bạn.",
+      "email_label": "Email",
+      "resend_btn": "Gửi lại mã",
+      "resending_btn": "Đang gửi lại..."
+    },
+    "verification": {
+      "title": "Vui lòng nhập mã xác minh.",
+      "code_label": "Mã",
+      "activate_btn": "Kích hoạt",
+      "activating_btn": "Đang kích hoạt..."
+    },
+    "done": {
+      "message": "Tuyệt vời! Tài khoản của bạn đã được kích hoạt. Bạn có thể bắt đầu sử dụng ngay.",
+      "close_btn": "Đóng"
+    }
   }
 }

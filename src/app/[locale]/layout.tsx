@@ -13,6 +13,7 @@ import {
 import { clsx } from "clsx";
 import { Inter } from "next/font/google";
 import { routing } from "@/i18n/routing";
+import { GlobalErrorProvider } from "@/components/global-error-provider";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -56,12 +57,14 @@ export default async function LocaleLayout({
       className={`${geist.variable} ${outfit.variable} text-base`}
     >
       <body className={`antialiased bg-neutral-50`}>
+        <GlobalErrorProvider>
         <NextIntlClientProvider>
           <NextAuthWrapper>
             <TooltipProvider> {children} </TooltipProvider>
           </NextAuthWrapper>
         </NextIntlClientProvider>
-        <Toaster className="z-[9999]" />
+        </GlobalErrorProvider>
+        <Toaster className="z-[1000]" />
       </body>
     </html>
   );

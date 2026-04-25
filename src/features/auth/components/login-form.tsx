@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { routes } from "@/routes";
-import { startTransition, useActionState, useState } from "react";
+import { startTransition, useActionState, useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { authenticate } from "../actions";
 import ResendEmailModal from "./resend-email-modal";
@@ -42,10 +42,10 @@ const LoginForm = () => {
   const tValidation = useTranslations();
 
   const schema = createLoginSchema(tValidation);
-
+  const [key, setKey] = useState(false);
   const [state, formAction, isPending] = useActionState(authenticate, null);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [serverError, setServerError] = useState(state?.error);
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(schema),
@@ -64,11 +64,12 @@ const LoginForm = () => {
   const resetForm = () => {
     setIsModalOpen(false);
     clearErrors("root");
+    setServerError(undefined);
     form.reset();
   };
 
   const onSubmit = (data: LoginValues) => {
-   const formData = toFormData(data);
+    const formData = toFormData(data);
     startTransition(() => {
       formAction(formData);
     });
@@ -108,6 +109,10 @@ const LoginForm = () => {
     );
   };
 
+  useEffect(() => {
+    setServerError(state?.error);
+  }, [state]);
+
   return (
     <>
       {/* LANGUAGE SWITCH */}
@@ -142,14 +147,16 @@ const LoginForm = () => {
 
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)}>
-
               <FieldGroup className="mb-6">
                 <Controller
                   name="email"
                   control={control}
                   render={({ field, fieldState }) => (
                     <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel>{t("email.label")}<span className="text-red-500 -ml-2 -mt-1">*</span></FieldLabel>
+                      <FieldLabel>
+                        {t("email.label")}
+                        <span className="text-red-500 -ml-2 -mt-1">*</span>
+                      </FieldLabel>
                       <Input
                         {...field}
                         type="email"
@@ -183,7 +190,7 @@ const LoginForm = () => {
                   {isPending ? t("buttons.loading") : t("buttons.login")}
                 </Button>
                 <ServerError
-                  error={state?.error}
+                  error={serverError}
                   onActivate={() => setIsModalOpen(true)}
                 />
                 <Button
