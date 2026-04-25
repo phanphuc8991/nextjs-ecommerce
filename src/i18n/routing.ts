@@ -10,7 +10,7 @@ export const routing = defineRouting({
     "/dashboard": "/dashboard"
   },
 });
-export const publicPages = ["/","/auth",'/verify'];
+export const publicPages = ["/","/auth"];
 
 export type Pathnames = keyof typeof routing.pathnames;
 export type Locale = (typeof routing.locales)[number];

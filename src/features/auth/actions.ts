@@ -77,7 +77,7 @@ export async function register(
     };
   }
   const locale = await getLocale();
-  redirect(`/${locale}/verify/${id}?e=${encodeURIComponent(encodedEmail)}`);
+ redirect(`/${locale}/auth/verify?id=${id}&e=${encodeURIComponent(encodedEmail)}`);
 }
 
 export async function verify(

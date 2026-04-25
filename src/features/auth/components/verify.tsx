@@ -40,7 +40,6 @@ export default function VerifyForm(props: any) {
   });
   const { control, handleSubmit } = form;
   async function onSubmit(data: VerifyLoginValues) {
-    console.log("fieldState.error");
     const formData = toFormData(data);
     startTransition(() => {
       formAction(formData);
