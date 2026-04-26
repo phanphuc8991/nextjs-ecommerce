@@ -1,11 +1,11 @@
 import { useRef, useState } from "react";
 import { resend, reVerify } from "../actions";
 import { CustomError } from "../next-auth";
-import { useGlobalError } from "@/components/global-error-provider";
 import { toFormData } from "@/lib/toFormData";
+import { useErrorStore } from "@/stores/error.store";
 
 export const useResendEmail = () => {
-  const { showError } = useGlobalError();
+  const showError = useErrorStore((s) => s.showError);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<CustomError>();
   const refUserId = useRef<string | undefined>("");
@@ -31,8 +31,12 @@ export const useResendEmail = () => {
     if (result.success) {
       onSuccess();
     } else {
-      showError("", result?.error?.message);
-      setError(result.error);
+      if (result.error?.type === "INVALID_CODE" || result.error?.type === "CODE_EXPIRED") {
+        setError(result.error);
+        showError("", result?.error?.message);
+      } else {
+        showError("", result?.error?.message);
+      }
     }
     setIsLoading(false);
     return result;

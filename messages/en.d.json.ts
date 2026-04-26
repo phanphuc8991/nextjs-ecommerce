@@ -153,6 +153,11 @@ declare const messages: {
       "activate_btn": "Activate",
       "activating_btn": "Activating..."
     },
+    "errors": {
+     "invalidCode": "That code doesn’t look right. Please try again.",
+     "codeExperid": "This code has expired. Please close the popup and try again.",
+     "unknown": "Something went wrong. Please try again."
+    },
     "done": {
       "message": "Great! Your account has been activated. You can start using it right away.",
       "close_btn": "Close"

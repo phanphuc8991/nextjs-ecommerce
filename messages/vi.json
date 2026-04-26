@@ -153,6 +153,11 @@
       "activate_btn": "Kích hoạt",
       "activating_btn": "Đang kích hoạt..."
     },
+    "error": {
+      "invalidCode": "Mã không hợp lệ. Vui lòng thử lại.",
+      "codeExpired": "Mã đã hết hạn. Vui lòng đóng cửa sổ và thử lại.",
+       "unknown": "Đã có lỗi xảy ra. Vui lòng thử lại."
+    },
     "done": {
       "message": "Tuyệt vời! Tài khoản của bạn đã được kích hoạt. Bạn có thể bắt đầu sử dụng ngay.",
       "close_btn": "Đóng"

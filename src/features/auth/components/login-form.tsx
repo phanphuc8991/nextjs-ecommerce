@@ -37,12 +37,9 @@ const LoginForm = () => {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-
   const t = useTranslations("auth.login");
   const tValidation = useTranslations();
-
   const schema = createLoginSchema(tValidation);
-  const [key, setKey] = useState(false);
   const [state, formAction, isPending] = useActionState(authenticate, null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [serverError, setServerError] = useState(state?.error);
@@ -77,7 +74,6 @@ const LoginForm = () => {
 
   const ServerError = ({ error, onActivate }: ServerErrorProps) => {
     if (!error) return null;
-
     const renderError = () => {
       switch (error.type) {
         case "ACCOUNT_INACTIVE":
@@ -89,10 +85,8 @@ const LoginForm = () => {
               </span>
             </span>
           );
-
         case "UNAUTHORIZED":
           return <span>{t("errors.unauthorized")}</span>;
-
         default:
           return <span>{t("errors.unknown")}</span>;
       }
@@ -132,11 +126,9 @@ const LoginForm = () => {
         </button>
       </div>
 
-      <ResendEmailModal
-        isModalOpen={isModalOpen}
-        resetForm={resetForm}
-        userEmail={state?.email}
-      />
+      {isModalOpen && (
+        <ResendEmailModal resetForm={resetForm} userEmail={state?.email} />
+      )}
 
       <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
         <Card className="w-full sm:max-w-md">

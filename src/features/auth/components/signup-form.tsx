@@ -97,6 +97,7 @@ const SignupForm = () => {
                         field.onChange(e);
                         clearErrors("root");
                       }}
+                      aria-invalid={fieldState.invalid}
                     />
 
                     {fieldState.error && (
@@ -123,6 +124,7 @@ const SignupForm = () => {
                         field.onChange(e);
                         clearErrors("root");
                       }}
+                      aria-invalid={fieldState.invalid}
                     />
 
                     {fieldState.error && (
@@ -145,12 +147,13 @@ const SignupForm = () => {
                     </FieldLabel>
                     <Input
                       {...field}
-                      type="email"
+                      // type="email"
                       placeholder={t("email.placeholder")}
                       onChange={(e) => {
                         field.onChange(e);
                         clearErrors("root");
                       }}
+                      aria-invalid={fieldState.invalid}
                     />
 
                     {fieldState.error && (
