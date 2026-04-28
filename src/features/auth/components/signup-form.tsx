@@ -22,11 +22,14 @@ import { Controller, useForm } from "react-hook-form";
 import { createSignUpSchema, SignUpValues } from "../constants";
 import PasswordField from "@/components/PasswordField";
 import { useTranslations, useLocale } from "next-intl";
-import { startTransition, useActionState } from "react";
+import { useActionState } from "react";
 import { toFormData } from "@/lib/toFormData";
 import { register } from "../actions";
 import { ServerErrorProps } from "../next-auth";
+import { useGlobalTransition } from "@/hooks/useGlobalTransition";
+
 const SignupForm = () => {
+  const { startTransition } = useGlobalTransition();
   const t = useTranslations("auth.signup");
   const tValidation = useTranslations();
   const schema = createSignUpSchema(tValidation);

@@ -2,7 +2,7 @@
 
 import { cn } from "@/lib/cn";
 import { defineStepper } from "@stepperize/react";
-import { CheckCircle, User, BadgeCheck, Check, X} from "lucide-react";
+import { CheckCircle, User, BadgeCheck, Check, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import React, { useState } from "react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -54,9 +54,13 @@ export const ResendEmailModal = ({
           <section id="resend-email-modal">
             <ResendContent userEmail={userEmail} resetForm={resetForm} />
           </section>
-           <span onClick={() => resetForm()}className='absolute top-0 right-0 p-2 cursor-pointer'><X  className="size-4" /></span>
+          <span
+            onClick={() => resetForm()}
+            className="absolute top-0 right-0 p-2 cursor-pointer"
+          >
+            <X className="size-4" />
+          </span>
         </DialogContent>
-       
       </Dialog>
     </stepper.Scoped>
   );
@@ -66,7 +70,6 @@ const ResendContent = (props: any) => {
   const t = useTranslations("ResendEmail");
   const { isLoading, handleResend, handleVerify, error } = useResendEmail();
   const methods = stepper.useStepper();
-
   const [code, setCode] = useState("");
   const isComplete = methods.state.isLast;
 
@@ -79,9 +82,10 @@ const ResendContent = (props: any) => {
             <Button
               type="submit"
               className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
-              onClick={() =>
-                handleResend(props.userEmail, methods.navigation.next)
-              }
+              onClick={() => {
+                console.log('click');
+                handleResend(props.userEmail, methods.navigation.next);
+              }}
               disabled={isLoading}
             >
               {isLoading ? t("login.resending_btn") : t("login.resend_btn")}
@@ -95,7 +99,9 @@ const ResendContent = (props: any) => {
             <Button
               type="submit"
               className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
-              onClick={() => handleVerify(code, methods.navigation.next)}
+              onClick={() => {
+                handleVerify(code, methods.navigation.next)
+              }}
               disabled={isLoading || !code}
             >
               {isLoading
@@ -129,7 +135,7 @@ const ResendContent = (props: any) => {
       <div className="border border-gray-6 rounded-xl overflow-hidden bg-gray-2/30">
         <StepperHeader methods={methods} isComplete={isComplete} t={t} />
         <div className="p-6">
-          <form>
+          {/* <form> */}
             <AnimatePresence mode="wait">
               {methods.flow.when("login", () => (
                 <motion.div key="step1" {...motionProps}>
@@ -153,7 +159,7 @@ const ResendContent = (props: any) => {
               ))}
             </AnimatePresence>
             {renderButton(methods)}
-          </form>
+          {/* </form> */}
         </div>
       </div>
     </div>
@@ -265,7 +271,7 @@ const ServerError = (error: any, t: any) => {
       case "INVALID_CODE":
         return <span>{t("errors.invalidCode")}</span>;
       case "CODE_EXPIRED":
-        return <span>{t("errors.codeExperid")}</span>;
+        return <span>{t("errors.codeExpired")}</span>;
       default:
         return <span>{t("errors.unknown")}</span>;
     }

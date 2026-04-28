@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { routes } from "@/routes";
-import { startTransition, useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { authenticate } from "../actions";
 import ResendEmailModal from "./resend-email-modal";
@@ -32,6 +32,7 @@ import { useRouter, usePathname } from "@/i18n/navigation";
 import Link from "next/link";
 import { ServerErrorProps } from "../next-auth";
 import { toFormData } from "@/lib/toFormData";
+import { useGlobalTransition } from "@/hooks/useGlobalTransition";
 
 const LoginForm = () => {
   const locale = useLocale();
@@ -41,9 +42,10 @@ const LoginForm = () => {
   const tValidation = useTranslations();
   const schema = createLoginSchema(tValidation);
   const [state, formAction, isPending] = useActionState(authenticate, null);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [serverError, setServerError] = useState(state?.error);
-
+  const { startTransition } = useGlobalTransition();
   const form = useForm<LoginValues>({
     resolver: zodResolver(schema),
     defaultValues: {

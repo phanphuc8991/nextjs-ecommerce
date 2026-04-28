@@ -112,9 +112,9 @@ export default function AddUser(props: any) {
   async function onSubmit(values: any) {
     clearErrors("root");
     try {
-      const formData = new FormData(); // Tạo FormData để gửi file + text
+      const formData = new FormData(); 
 
-      // === Phần 1: Thêm tất cả các trường text (name, email, role, password...) ===
+     
       Object.entries(values).forEach(([key, value]) => {
         if (key !== "avatar" && value !== undefined) {
           formData.append(key, String(value));
@@ -127,7 +127,7 @@ export default function AddUser(props: any) {
           `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/users/upload-avatar`,
           {
             method: "POST",
-            body: formData, // Quan trọng: gửi dưới dạng FormData (multipart/form-data)
+            body: formData, 
           },
         );
       }

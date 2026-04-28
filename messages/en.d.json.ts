@@ -128,7 +128,7 @@ declare const messages: {
     "errors": {
       "invalidId": "Invalid session. Click <resend>here</resend> to log in again.",
       "invalidCode": "That code doesn’t look right. Please try again.",
-      "codeExperid": "This code has expired. Please click <resend>Resend</resend> to get a new one.",
+      "codeExpired": "This code has expired. Please click <resend>Resend</resend> to get a new one.",
       "unknown": "Something went wrong. Please try again."
     },
     "validation": {
@@ -155,7 +155,7 @@ declare const messages: {
     },
     "errors": {
      "invalidCode": "That code doesn’t look right. Please try again.",
-     "codeExperid": "This code has expired. Please close the popup and try again.",
+     "codeExpired": "This code has expired. Please close the popup and try again.",
      "unknown": "Something went wrong. Please try again."
     },
     "done": {

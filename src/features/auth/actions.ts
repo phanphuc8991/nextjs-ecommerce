@@ -82,10 +82,10 @@ export async function register(
   );
 }
 
-export async function resend(email: string): Promise<FormState> {
+export async function resend(formData: FormData): Promise<FormState> {
   try {
+    const email = formData.get("email") as string;
     const res = await resendActivation({ email });
-    console.log("ressss", res);
     if (res.success) {
       return {
         success: true,
@@ -114,7 +114,6 @@ export async function verify(
 ): Promise<FormState> {
   const _id = formData.get("_id") as string;
   const code = formData.get("code") as string;
-
   try {
     const res = await checkCode({
       _id,
@@ -145,13 +144,11 @@ export async function reVerify(
 ): Promise<FormState> {
   const _id = formData.get("_id") as string;
   const code = formData.get("code") as string;
-
   try {
     const res = await checkCode({
       _id,
       code,
     });
-    console.log('ressss',res);
     if (res.success) {
       return {
         success: true,

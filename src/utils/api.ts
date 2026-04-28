@@ -1,7 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { auth } from "@/auth";
 import { ApiResponse } from "@/types/backend";
-
 const api: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   timeout: 30000,
@@ -11,6 +10,8 @@ const api: AxiosInstance = axios.create({
 });
 
 api.interceptors.request.use(async (config) => {
+  console.log('config');
+  
   const session = await auth();
   const token = session?.user?.access_token;
   if (token) {
@@ -20,13 +21,13 @@ api.interceptors.request.use(async (config) => {
 });
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
   async (error) => {
     const status = error.response?.status;
     if (status === 401) {
       console.warn("Token expired or invalid");
-      // await logout();
-      // or await refreshToken();
     }
     return Promise.reject(error);
   },
@@ -55,11 +56,15 @@ export const sendRequest = async <T = any>(
           raw: error,
         };
       }
-      if (`${error.status}` === "403" || `${error.status}` === "401" || `${error.status}` === "400") {
+      if (
+        `${error.status}` === "403" ||
+        `${error.status}` === "401" ||
+        `${error.status}` === "400"
+      ) {
         const message = response.data?.message || "UNKNOWN_ERROR";
         return {
           success: false,
-          statusCode: error.status as  number,
+          statusCode: error.status as number,
           message: message,
           raw: response.data,
         };

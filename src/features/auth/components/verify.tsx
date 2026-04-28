@@ -19,13 +19,15 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
 import { createVerifyLoginSchema, VerifyLoginValues } from "../constants";
-import { startTransition, useActionState } from "react";
+import { useActionState } from "react";
 import { toFormData } from "@/lib/toFormData";
 import { verify } from "../actions";
 import { Input } from "@/components/ui/input";
 import { ServerErrorProps } from "../next-auth";
+import { useGlobalTransition } from "@/hooks/useGlobalTransition";
 
 export default function VerifyForm(props: any) {
+  const { startTransition } = useGlobalTransition();
   const { _id, email } = props;
   const t = useTranslations("verify");
   const [state, formAction, isPending] = useActionState(verify, null);

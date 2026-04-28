@@ -9,6 +9,8 @@ import { setRequestLocale, getMessages } from "next-intl/server";
 import { routing } from "@/i18n/routing";
 
 import { GlobalError } from "@/components/global-error";
+import { GlobalLoading } from "@/components/global-loading";
+import GlobalLoadingHandler from "@/components/global-loading-handler";
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -42,6 +44,8 @@ export default async function LocaleLayout({
         </NextIntlClientProvider>
         <Toaster className="z-[1000]" />
         <GlobalError />
+        <GlobalLoading />
+        <GlobalLoadingHandler />
       </body>
     </html>
   );
