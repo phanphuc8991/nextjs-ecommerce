@@ -1,6 +1,8 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+
 import {
   Card,
   CardContent,
@@ -25,14 +27,22 @@ import { verify } from "../actions";
 import { Input } from "@/components/ui/input";
 import { ServerErrorProps } from "../next-auth";
 import { useGlobalTransition } from "@/hooks/useGlobalTransition";
+import { CheckCircle } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useLocale } from "next-intl";
+import { useResendEmail } from "../hook/useResendEmail";
+import { toast } from "sonner";
 
 export default function VerifyForm(props: any) {
+  const locale = useLocale();
+  const { handleResend, error } = useResendEmail();
   const { startTransition } = useGlobalTransition();
   const { _id, email } = props;
-  const t = useTranslations("verify");
+  const t = useTranslations();
   const [state, formAction, isPending] = useActionState(verify, null);
   const tValidation = useTranslations();
   const schema = createVerifyLoginSchema(tValidation);
+  const router = useRouter();
   const form = useForm<VerifyLoginValues>({
     resolver: zodResolver(schema),
     defaultValues: {
@@ -40,13 +50,25 @@ export default function VerifyForm(props: any) {
       code: "",
     },
   });
-  const { control, handleSubmit } = form;
+  const { control, handleSubmit, clearErrors, getValues } = form;
   async function onSubmit(data: VerifyLoginValues) {
     const formData = toFormData(data);
     startTransition(() => {
       formAction(formData);
     });
   }
+
+  const resendEmail = () => {
+    startTransition(() => {
+      handleResend(email, sendEmailSuccess);
+    });
+  };
+
+  const sendEmailSuccess = () => {
+    toast.success("Code sent. Please check your email.", {
+      position: "top-center",
+    });
+  };
   const ServerError = ({ error }: ServerErrorProps) => {
     if (!error) return null;
     const renderError = () => {
@@ -55,10 +77,29 @@ export default function VerifyForm(props: any) {
         case "INVALID_CODE":
           return (
             <span>
-              {t.rich("errors.invalidId", {
+              {t.rich("verify.errors.invalidId", {
                 resend: (chunks) => (
                   <span
-                    onClick={() => {}}
+                    onClick={() => {
+                      router.push(`/${locale}/auth/login`);
+                    }}
+                    style={{ cursor: "pointer", textDecoration: "underline" }}
+                  >
+                    {chunks}
+                  </span>
+                ),
+              })}
+            </span>
+          );
+        case "INVALID_EMAIL":
+          return (
+            <span>
+              {t.rich("verify.errors.invalidId", {
+                resend: (chunks) => (
+                  <span
+                    onClick={() => {
+                      router.push(`/${locale}/auth/login`);
+                    }}
                     style={{ cursor: "pointer", textDecoration: "underline" }}
                   >
                     {chunks}
@@ -70,10 +111,12 @@ export default function VerifyForm(props: any) {
         case "CODE_EXPIRED":
           return (
             <span>
-              {t.rich("errors.codeExpired", {
+              {t.rich("verify.errors.codeExpired", {
                 resend: (chunks) => (
                   <span
-                    onClick={() => {}}
+                    onClick={() => {
+                      resendEmail();
+                    }}
                     style={{ cursor: "pointer", textDecoration: "underline" }}
                   >
                     {chunks}
@@ -83,7 +126,7 @@ export default function VerifyForm(props: any) {
             </span>
           );
         default:
-          return <span>{t("errors.unknown")}</span>;
+          return <span>{t("verify.errors.unknown")}</span>;
       }
     };
     return (
@@ -96,18 +139,52 @@ export default function VerifyForm(props: any) {
       </div>
     );
   };
+
+  function SuccessDialog() {
+    return (
+      <Dialog open={true}>
+        <DialogContent
+          showCloseButton={false}
+          className="sm:max-w-md text-center p-6"
+        >
+          <DialogTitle></DialogTitle>
+          <div className="flex justify-center mb-4">
+            <CheckCircle className="w-12 h-12 text-green-500" />
+          </div>
+
+          <h2 className="text-xl font-semibold mb-2">
+            {t("verifySuccess.title")}
+          </h2>
+
+          <p className="text-gray-500 mb-6">{t("verifySuccess.description")}</p>
+
+          <Button
+            className="w-full"
+            onClick={() => {
+              router.push(`/${locale}/auth/login`);
+            }}
+          >
+            {t("verifySuccess.buttons.continue")}
+          </Button>
+        </DialogContent>
+      </Dialog>
+    );
+  }
   return (
     <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
+      {state?.success && SuccessDialog()}
+
       <Card className="w-full sm:max-w-md">
         <CardHeader className="text-center">
-          <CardTitle>{t("title")}</CardTitle>
-          <CardDescription>{t("description", { email })}</CardDescription>
+          <CardTitle>{t("verify.title")}</CardTitle>
+          <CardDescription>
+            {t("verify.description", { email })}
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Input type="hidden" value={_id} />
-
             <FieldGroup className="mb-4">
               <div className="flex justify-center">
                 <Controller
@@ -119,7 +196,12 @@ export default function VerifyForm(props: any) {
                         maxLength={6}
                         value={field.value}
                         onChange={(value) => {
+                          if (!value) {
+                            form.reset();
+                            clearErrors("root");
+                          }
                           const onlyNums = value.replace(/[^0-9]/g, "");
+
                           field.onChange(onlyNums);
                         }}
                         inputMode="numeric"
@@ -156,9 +238,11 @@ export default function VerifyForm(props: any) {
             </FieldGroup>
 
             <Field>
-              <ServerError error={state?.error} />
+              <ServerError error={state?.error || error} />
               <Button type="submit" className="w-full" disabled={isPending}>
-                {isPending ? t("buttons.loading") : t("buttons.submit")}
+                {isPending
+                  ? t("verify.buttons.loading")
+                  : t("verify.buttons.submit")}
               </Button>
             </Field>
           </form>

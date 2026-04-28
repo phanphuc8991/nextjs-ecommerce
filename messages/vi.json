@@ -162,5 +162,13 @@
       "message": "Tuyệt vời! Tài khoản của bạn đã được kích hoạt. Bạn có thể bắt đầu sử dụng ngay.",
       "close_btn": "Đóng"
     }
+  },
+   "verifySuccess": {
+    "title": "Xác thực thành công 🎉",
+    "description": "Tài khoản của bạn đã được kích hoạt. Bạn có thể đăng nhập ngay bây giờ.",
+    "buttons": {
+      "continue": "Tiếp tục đăng nhập",
+      "redirecting": "Đang chuyển hướng..."
+    }
   }
 }

@@ -135,7 +135,6 @@ const ResendContent = (props: any) => {
       <div className="border border-gray-6 rounded-xl overflow-hidden bg-gray-2/30">
         <StepperHeader methods={methods} isComplete={isComplete} t={t} />
         <div className="p-6">
-          {/* <form> */}
             <AnimatePresence mode="wait">
               {methods.flow.when("login", () => (
                 <motion.div key="step1" {...motionProps}>
@@ -159,7 +158,6 @@ const ResendContent = (props: any) => {
               ))}
             </AnimatePresence>
             {renderButton(methods)}
-          {/* </form> */}
         </div>
       </div>
     </div>

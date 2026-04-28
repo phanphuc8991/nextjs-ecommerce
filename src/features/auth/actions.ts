@@ -12,6 +12,23 @@ type FormState = {
   _id?: string;
 };
 
+function handleAuthError(
+  error: unknown,
+  extra?: Partial<FormState>,
+): FormState {
+  let type = "MANUAL";
+  let message = "Something went wrong. Please try again.";
+  if (error instanceof CustomAuthError) {
+    type = error.customType || type;
+    message = error.customName || message;
+  }
+  return {
+    success: false,
+    error: { type, message },
+    ...extra,
+  };
+}
+
 export async function authenticate(
   preveState: FormState | null,
   formData: FormData,
@@ -25,17 +42,10 @@ export async function authenticate(
       redirect: false,
     });
   } catch (error) {
-    let type = "MANUAL";
-    let message = "Something went wrong. Please try again.";
-    if (error instanceof CustomAuthError) {
-      type = error.customType || type;
-      message = error.customName || message;
-    }
-    return {
-      success: false,
-      error: { type, message },
+    const type = error instanceof CustomAuthError ? error.customType : "MANUAL";
+    return handleAuthError(error, {
       email: type === "ACCOUNT_INACTIVE" ? email : undefined,
-    };
+    });
   }
   const locale = await getLocale();
   redirect(`/${locale}/dashboard`);
@@ -65,16 +75,7 @@ export async function register(
       throw new CustomAuthError("", res.raw.type, res.raw.message);
     }
   } catch (error) {
-    let type = "MANUAL";
-    let message = "Something went wrong. Please try again.";
-    if (error instanceof CustomAuthError) {
-      type = error.customType || type;
-      message = error.customName || message;
-    }
-    return {
-      success: false,
-      error: { type, message },
-    };
+    return handleAuthError(error);
   }
   const locale = await getLocale();
   redirect(
@@ -95,16 +96,7 @@ export async function resend(formData: FormData): Promise<FormState> {
       throw new CustomAuthError("", res.raw.type, res.raw.message);
     }
   } catch (error) {
-    let type = "MANUAL";
-    let message = "Something went wrong. Please try again.";
-    if (error instanceof CustomAuthError) {
-      type = error.customType || type;
-      message = error.customName || message;
-    }
-    return {
-      success: false,
-      error: { type, message },
-    };
+    return handleAuthError(error);
   }
 }
 
@@ -122,20 +114,10 @@ export async function verify(
     if (!res.success) {
       throw new CustomAuthError("", res.raw.type, res.raw.message);
     }
+    return { success: true };
   } catch (error) {
-    let type = "MANUAL";
-    let message = "Something went wrong. Please try again.";
-    if (error instanceof CustomAuthError) {
-      type = error.customType || type;
-      message = error.customName || message;
-    }
-    return {
-      success: false,
-      error: { type, message },
-    };
+    return handleAuthError(error);
   }
-  const locale = await getLocale();
-  redirect(`/${locale}/auth/login`);
 }
 
 export async function reVerify(
@@ -157,15 +139,6 @@ export async function reVerify(
       throw new CustomAuthError("", res.raw.type, res.raw.message);
     }
   } catch (error) {
-    let type = "MANUAL";
-    let message = "Something went wrong. Please try again.";
-    if (error instanceof CustomAuthError) {
-      type = error.customType || type;
-      message = error.customName || message;
-    }
-    return {
-      success: false,
-      error: { type, message },
-    };
+    return handleAuthError(error);
   }
 }

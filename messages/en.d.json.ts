@@ -162,6 +162,14 @@ declare const messages: {
       "message": "Great! Your account has been activated. You can start using it right away.",
       "close_btn": "Close"
     }
+  },
+   "verifySuccess": {
+    "title": "Verification successful 🎉",
+    "description": "Your account has been activated. You can now log in.",
+    "buttons": {
+      "continue": "Continue to login",
+      "redirecting": "Redirecting..."
+    }
   }
 };
 export default messages;
