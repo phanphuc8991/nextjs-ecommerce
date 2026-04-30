@@ -2,7 +2,12 @@
 import { signIn } from "@/auth";
 import { CustomAuthError } from "@/utils/errors";
 import { redirect } from "next/navigation";
-import { checkCode, registerUser, resendActivation } from "./services";
+import {
+  checkCode,
+  forgotPasswordService,
+  registerUser,
+  resendActivation,
+} from "./services";
 import { getLocale } from "next-intl/server";
 
 type FormState = {
@@ -130,6 +135,33 @@ export async function reVerify(
     const res = await checkCode({
       _id,
       code,
+    });
+    if (res.success) {
+      return {
+        success: true,
+      };
+    } else {
+      throw new CustomAuthError("", res.raw.type, res.raw.message);
+    }
+  } catch (error) {
+    return handleAuthError(error);
+  }
+}
+
+export async function forgotPassword(
+  preveState: FormState | null,
+  formData: FormData,
+): Promise<FormState> {
+  const userId = formData.get("userId") as string;
+  const code = formData.get("code") as string;
+  const newPassword = formData.get("newPassword") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
+  try {
+    const res = await forgotPasswordService({
+      _id: userId,
+      code,
+      newPassword,
+      confirmPassword,
     });
     if (res.success) {
       return {

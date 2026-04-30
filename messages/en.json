@@ -132,6 +132,56 @@
       "code": "Code must be 6 digits"
     }
   },
+  "forgotPassword": {
+    "steps": {
+      "email": "Email",
+      "verifyAndReset": "Verify & Reset",
+      "done": "Done"
+    },
+    "stepOne": {
+      "title": "Reset your password",
+      "description": "Enter your email address and We'll send you a verification code.",
+      "email": {
+        "label": "Email",
+        "placeholder": ""
+      }
+    },
+    "stepTwo": {
+      "title": " Verify & reset your password",
+      "description": "  Enter the code sent to your email and set a new password.",
+      "code": {
+        "label": "Code",
+        "placeholder": ""
+      },
+      "newPassword": {
+        "label": "New password",
+        "placeholder": ""
+      },
+      "confirmPassword": {
+        "label": "Confirm password",
+        "placeholder": ""
+      }
+    },
+    "errors": {
+      "invalidCode": "That code doesn’t look right. Please try again.",
+      "invalidEmail": "Unable to send code. Please try again.",
+      "codeExpired": "This code has expired. Please close the popup and try again.",
+      "unknown": "Something went wrong. Please try again."
+    },
+    "buttons": {
+      "sendCode": "Send code",
+      "loading": "Sendind...",
+      "resetPassword": "Reset password"
+    },
+    "forgotPasswordSuccess": {
+      "title": "Password updated 🎉",
+      "description": "You can now log in with your new password.",
+      "buttons": {
+        "Close": "Close",
+        "redirecting": "Redirecting..."
+      }
+    }
+  },
   "ResendEmail": {
     "steps": {
       "login": "Sign In",
@@ -151,16 +201,16 @@
       "activating_btn": "Activating..."
     },
     "errors": {
-     "invalidCode": "That code doesn’t look right. Please try again.",
-     "codeExpired": "This code has expired. Please close the popup and try again.",
-     "unknown": "Something went wrong. Please try again."
+      "invalidCode": "That code doesn’t look right. Please try again.",
+      "codeExpired": "This code has expired. Please close the popup and try again.",
+      "unknown": "Something went wrong. Please try again."
     },
     "done": {
       "message": "Great! Your account has been activated. You can start using it right away.",
       "close_btn": "Close"
     }
   },
-   "verifySuccess": {
+  "verifySuccess": {
     "title": "Verification successful 🎉",
     "description": "Your account has been activated. You can now log in.",
     "buttons": {

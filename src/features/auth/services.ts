@@ -1,7 +1,7 @@
 import { sendRequest } from "@/utils/api";
 
 import { ApiResponse } from "@/types/backend";
-import {ResponseUserLogin, SignUpInput } from "./next-auth";
+import { ResponseUserLogin, SignUpInput } from "./next-auth";
 
 export const loginUser = async (payload: {
   email: string;
@@ -37,9 +37,24 @@ export const checkCode = async (payload: { _id: string; code: string }) => {
   });
 };
 
-export const resendActivation = async (payload: { email: string }): Promise<ApiResponse<{_id: string}>>=> {
+export const resendActivation = async (payload: {
+  email: string;
+}): Promise<ApiResponse<{ _id: string }>> => {
   return sendRequest({
     url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/resend-activation`,
+    method: "POST",
+    data: payload,
+  });
+};
+
+export const forgotPasswordService = async (payload: {
+  _id: string;
+  code: string;
+  newPassword: string;
+  confirmPassword: string;
+}): Promise<ApiResponse<{ _id: string }>> => {
+  return sendRequest({
+    url: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api/v1/auth/forgot-password`,
     method: "POST",
     data: payload,
   });

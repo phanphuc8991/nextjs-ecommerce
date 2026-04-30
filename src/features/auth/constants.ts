@@ -74,3 +74,38 @@ export const createVerifyLoginSchema = (t: TFunction) =>
 export type VerifyLoginValues = z.infer<
   ReturnType<typeof createVerifyLoginSchema>
 >;
+
+export const createForgetPasswordStepOneSchema = (t: TFunction) =>
+  z.object({
+    email: z
+      .string()
+      .trim()
+      .min(1, t("auth.validation.email.required"))
+      .email(t("auth.validation.email.invalid")),
+  });
+
+export type ForgetPasswordStepOneValues = z.infer<
+  ReturnType<typeof createForgetPasswordStepOneSchema>
+>;
+
+export const createForgetPasswordStepTwoSchema = (t: TFunction) =>
+  z.object({
+    userId: z.string(),
+    code: z.string().min(6, t("verify.validation.code")),
+    newPassword: z
+      .string()
+      .trim()
+      .min(8, t("auth.validation.password.min"))
+      .regex(/[A-Z]/, t("auth.validation.password.uppercase"))
+      .regex(/[a-z]/, t("auth.validation.password.lowercase"))
+      .regex(/[0-9]/, t("auth.validation.password.number"))
+      .regex(/[^A-Za-z0-9]/, t("auth.validation.password.special")),
+    confirmPassword: z
+      .string()
+      .trim()
+      .min(1, t("auth.validation.confirmPassword.required")),
+  });
+
+  export type ForgetPasswordStepTwoValues = z.infer<
+  ReturnType<typeof createForgetPasswordStepTwoSchema>
+>;

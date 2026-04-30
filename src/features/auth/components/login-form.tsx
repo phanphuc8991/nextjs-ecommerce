@@ -33,6 +33,7 @@ import Link from "next/link";
 import { ServerErrorProps } from "../next-auth";
 import { toFormData } from "@/lib/toFormData";
 import { useGlobalTransition } from "@/hooks/useGlobalTransition";
+import { ForgotPasswordlModal } from "./forgot-password-modal";
 
 const LoginForm = () => {
   const locale = useLocale();
@@ -44,6 +45,7 @@ const LoginForm = () => {
   const [state, formAction, isPending] = useActionState(authenticate, null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
   const [serverError, setServerError] = useState(state?.error);
   const { startTransition } = useGlobalTransition();
   const form = useForm<LoginValues>({
@@ -62,6 +64,7 @@ const LoginForm = () => {
 
   const resetForm = () => {
     setIsModalOpen(false);
+    setIsForgotPasswordOpen(false);
     clearErrors("root");
     setServerError(undefined);
     form.reset();
@@ -132,6 +135,8 @@ const LoginForm = () => {
         <ResendEmailModal resetForm={resetForm} userEmail={state?.email} />
       )}
 
+      {isForgotPasswordOpen && <ForgotPasswordlModal resetForm={resetForm} />}
+
       <div className="flex mx-10 sm:mx-0 min-h-screen items-center justify-center flex-col gap-6">
         <Card className="w-full sm:max-w-md">
           <CardHeader>
@@ -175,7 +180,9 @@ const LoginForm = () => {
                   name="password"
                   control={control}
                   clearErrors={clearErrors}
-                  hideForgetPassWord={false}
+                  handleForgotPassword={() => {
+                    setIsForgotPasswordOpen(true);
+                  }}
                 />
               </FieldGroup>
 
