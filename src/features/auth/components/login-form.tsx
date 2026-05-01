@@ -24,7 +24,7 @@ import { signIn } from "next-auth/react";
 import { authenticate } from "../actions";
 import ResendEmailModal from "./resend-email-modal";
 
-import { createLoginSchema, LoginValues } from "../constants";
+import { AUTH_ERROR_TYPES, createLoginSchema, LoginValues } from "../constants";
 
 import PasswordField from "@/components/PasswordField";
 import { useTranslations, useLocale } from "next-intl";
@@ -46,7 +46,9 @@ const LoginForm = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isForgotPasswordOpen, setIsForgotPasswordOpen] = useState(false);
-  const [serverError, setServerError] = useState(state?.error);
+  const [serverError, setServerError] = useState(
+    state && !state.success ? state.error : null,
+  );
   const { startTransition } = useGlobalTransition();
   const form = useForm<LoginValues>({
     resolver: zodResolver(schema),
@@ -66,7 +68,7 @@ const LoginForm = () => {
     setIsModalOpen(false);
     setIsForgotPasswordOpen(false);
     clearErrors("root");
-    setServerError(undefined);
+    setServerError(null);
     form.reset();
   };
 
@@ -81,7 +83,7 @@ const LoginForm = () => {
     if (!error) return null;
     const renderError = () => {
       switch (error.type) {
-        case "ACCOUNT_INACTIVE":
+        case AUTH_ERROR_TYPES.ACCOUNT_INACTIVE:
           return (
             <span>
               {t("errors.inactive")}{" "}
@@ -90,7 +92,7 @@ const LoginForm = () => {
               </span>
             </span>
           );
-        case "UNAUTHORIZED":
+        case AUTH_ERROR_TYPES.INVALID_CREDENTIALS:
           return <span>{t("errors.unauthorized")}</span>;
         default:
           return <span>{t("errors.unknown")}</span>;
@@ -109,7 +111,9 @@ const LoginForm = () => {
   };
 
   useEffect(() => {
-    setServerError(state?.error);
+    if (!state?.success) {
+      setServerError(state?.error || null);
+    }
   }, [state]);
 
   return (

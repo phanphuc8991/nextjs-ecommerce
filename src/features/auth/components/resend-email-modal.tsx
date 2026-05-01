@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/input-otp";
 import { useResendEmail } from "../hook/useResendEmail";
 import { useTranslations } from "next-intl";
+import { AUTH_ERROR_TYPES } from "../constants";
 
 const stepper = defineStepper(
   { id: "login", label: "step_login", icon: User },
@@ -68,7 +69,7 @@ export const ResendEmailModal = ({
 
 const ResendContent = (props: any) => {
   const t = useTranslations("ResendEmail");
-  const { isLoading, handleResend, handleVerify, error } = useResendEmail();
+  const { isLoading, handleResend, handleVerify, state } = useResendEmail();
   const methods = stepper.useStepper();
   const [code, setCode] = useState("");
   const isComplete = methods.state.isLast;
@@ -83,7 +84,7 @@ const ResendContent = (props: any) => {
               type="submit"
               className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
               onClick={() => {
-                console.log('click');
+                console.log("click");
                 handleResend(props.userEmail, methods.navigation.next);
               }}
               disabled={isLoading}
@@ -100,7 +101,7 @@ const ResendContent = (props: any) => {
               type="submit"
               className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
               onClick={() => {
-                handleVerify(code, methods.navigation.next)
+                handleVerify(code, methods.navigation.next);
               }}
               disabled={isLoading || !code}
             >
@@ -135,29 +136,29 @@ const ResendContent = (props: any) => {
       <div className="border border-gray-6 rounded-xl overflow-hidden bg-gray-2/30">
         <StepperHeader methods={methods} isComplete={isComplete} t={t} />
         <div className="p-6">
-            <AnimatePresence mode="wait">
-              {methods.flow.when("login", () => (
-                <motion.div key="step1" {...motionProps}>
-                  <LoginStep userEmail={props.userEmail} t={t} />
-                </motion.div>
-              ))}
-              {methods.flow.when("verification", () => (
-                <motion.div key="step2" {...motionProps}>
-                  <Verification
-                    code={code}
-                    setCode={setCode}
-                    t={t}
-                    error={error}
-                  />
-                </motion.div>
-              ))}
-              {methods.flow.when("done", () => (
-                <motion.div key="step3" {...motionProps}>
-                  <h4 className="pt-[50px] pb-[25px]">{t("done.message")}</h4>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-            {renderButton(methods)}
+          <AnimatePresence mode="wait">
+            {methods.flow.when("login", () => (
+              <motion.div key="step1" {...motionProps}>
+                <LoginStep userEmail={props.userEmail} t={t} />
+              </motion.div>
+            ))}
+            {methods.flow.when("verification", () => (
+              <motion.div key="step2" {...motionProps}>
+                <Verification
+                  code={code}
+                  setCode={setCode}
+                  t={t}
+                  state={state}
+                />
+              </motion.div>
+            ))}
+            {methods.flow.when("done", () => (
+              <motion.div key="step3" {...motionProps}>
+                <h4 className="pt-[50px] pb-[25px]">{t("done.message")}</h4>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          {renderButton(methods)}
         </div>
       </div>
     </div>
@@ -266,9 +267,9 @@ const ServerError = (error: any, t: any) => {
   if (!error?.type) return null;
   const renderError = () => {
     switch (error?.type) {
-      case "INVALID_CODE":
+      case AUTH_ERROR_TYPES.INVALID_CODE:
         return <span>{t("errors.invalidCode")}</span>;
-      case "CODE_EXPIRED":
+      case AUTH_ERROR_TYPES.CODE_EXPIRED:
         return <span>{t("errors.codeExpired")}</span>;
       default:
         return <span>{t("errors.unknown")}</span>;
@@ -276,7 +277,7 @@ const ServerError = (error: any, t: any) => {
   };
   return <div className="text-sm text-destructive mt-2">{renderError()}</div>;
 };
-const Verification = ({ code, setCode, t, error }: any) => (
+const Verification = ({ code, setCode, t, state }: any) => (
   <div>
     <h6 className="text-base font-semibold text-gray-12 mb-4">
       {t("verification.title")}
@@ -309,7 +310,7 @@ const Verification = ({ code, setCode, t, error }: any) => (
         <InputOTPSlot index={5} />
       </InputOTPGroup>
     </InputOTP>
-    <div>{ServerError(error, t)}</div>
+    <div>{!state.success && ServerError(state.error, t)}</div>
   </div>
 );
 

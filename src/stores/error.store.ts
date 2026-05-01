@@ -1,13 +1,13 @@
 import { create } from "zustand";
 
 type ErrorType = {
-  title: string;
+  title?: string;
   message?: string;
 };
 
 type ErrorState = {
   error: ErrorType | null;
-  showError: (title: string, message?: string) => void;
+  showError: (title?: string, message?: string) => void;
   clearError: () => void;
 };
 

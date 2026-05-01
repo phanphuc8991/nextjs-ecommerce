@@ -42,7 +42,7 @@ export default async function LocaleLayout({
             <TooltipProvider> {children} </TooltipProvider>
           </NextAuthWrapper>
         </NextIntlClientProvider>
-        <Toaster className="z-[1000]" />
+        <Toaster richColors  className="z-[1000]" />
         <GlobalError />
         <GlobalLoading />
         <GlobalLoadingHandler />

@@ -35,7 +35,7 @@ export interface LoginResponse {
 }
 
 export type ServerErrorProps = {
-  error?: { type: string; message?: string };
+  error: ApiErrorDetail | null;
   onActivate?: () => void;
 };
 

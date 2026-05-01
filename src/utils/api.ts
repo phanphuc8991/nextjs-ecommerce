@@ -1,6 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
 import { auth } from "@/auth";
-import { ApiResponse } from "@/types/backend";
+import { ApiResponse, ApiSuccess } from "@/types/backend";
 const api: AxiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_BACKEND_URL,
   timeout: 30000,
@@ -10,8 +10,6 @@ const api: AxiosInstance = axios.create({
 });
 
 api.interceptors.request.use(async (config) => {
-  console.log('config');
-  
   const session = await auth();
   const token = session?.user?.access_token;
   if (token) {
@@ -37,44 +35,30 @@ export const sendRequest = async <T = any>(
   config: AxiosRequestConfig,
 ): Promise<ApiResponse<T>> => {
   try {
-    const response: any = await api.request<T>(config);
-    return {
-      success: true,
-      data: response?.data?.data,
-      statusCode: response.status,
-    };
-  } catch (error: any) {
-    if (axios.isAxiosError(error)) {
-      const { response } = error;
-      if (!response) {
-        const message =
-          error.code === "ECONNABORTED" ? "REQUEST_TIMEOUT" : "NETWORK_ERROR";
-        return {
-          success: false,
-          statusCode: 0,
-          message,
-          raw: error,
-        };
-      }
-      if (
-        `${error.status}` === "403" ||
-        `${error.status}` === "401" ||
-        `${error.status}` === "400"
-      ) {
-        const message = response.data?.message || "UNKNOWN_ERROR";
-        return {
-          success: false,
-          statusCode: error.status as number,
-          message: message,
-          raw: response.data,
-        };
-      }
+    const response = await api.request<ApiSuccess<T>>(config);
+    return response.data;
+  } catch (error) {
+     if (axios.isAxiosError(error)) {
+      const res = error.response;
+      const data = res?.data;
+      return {
+        success: false,
+        statusCode: res?.status ?? 500,
+        error: data?.error || {
+          type: "UNKNOWN_ERROR",
+          message: error.message,
+        },
+        timestamp: data?.timestamp,
+        path: data?.path,
+      };
     }
     return {
       success: false,
-      statusCode: 0,
-      message: "UNKNOWN_ERROR",
-      raw: error,
+      statusCode: 500,
+      error: {
+        type: "UNKNOWN_ERROR",
+        message: "Something went wrong. Please try again.",
+      },
     };
   }
 };

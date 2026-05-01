@@ -19,7 +19,11 @@ import { routes } from "@/routes";
 import Link from "next/link";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
-import { createSignUpSchema, SignUpValues } from "../constants";
+import {
+  AUTH_ERROR_TYPES,
+  createSignUpSchema,
+  SignUpValues,
+} from "../constants";
 import PasswordField from "@/components/PasswordField";
 import { useTranslations, useLocale } from "next-intl";
 import { useActionState } from "react";
@@ -56,7 +60,7 @@ const SignupForm = () => {
     if (!error) return null;
     const renderError = () => {
       switch (error.type) {
-        case "EMAIL_ALREADY_EXISTS":
+        case AUTH_ERROR_TYPES.EMAIL_ALREADY_EXISTS:
           return <span>{t("errors.emailAlreadyExists")}</span>;
         default:
           return <span>{t("errors.unknown")}</span>;
@@ -191,7 +195,8 @@ const SignupForm = () => {
               <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending ? t("buttons.loading") : t("buttons.signup")}
               </Button>
-              <ServerError error={state?.error} />
+              {!state?.success && <ServerError error={state?.error} />}
+
               <Button variant="outline" type="button" disabled={true}>
                 {t("buttons.googleSignup")}
               </Button>

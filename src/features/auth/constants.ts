@@ -1,4 +1,34 @@
 import * as z from "zod";
+export const AUTH_ERROR_TYPES = {
+  UNKNOWN_ERROR: "UNKNOWN_ERROR",
+  ACCOUNT_INACTIVE: "ACCOUNT_INACTIVE",
+  INVALID_CODE: "INVALID_CODE",
+  CODE_EXPIRED: "CODE_EXPIRED",
+  INVALID_ID: "INVALID_ID",
+  INVALID_EMAIL: "INVALID_EMAIL",
+  INVALID_CREDENTIALS: "INVALID_CREDENTIALS",
+  EMAIL_ALREADY_EXISTS: "EMAIL_ALREADY_EXISTS"
+} as const;
+
+export type AuthErrorType =
+  (typeof AUTH_ERROR_TYPES)[keyof typeof AUTH_ERROR_TYPES];
+
+  type SuccessState = {
+  success: true;
+  email?: string;
+  _id?: string;
+};
+
+type ErrorState = {
+  success: false;
+  error: {
+    type: string;
+    message: string;
+  };
+  email?: string;
+};
+
+export type FormState = SuccessState | ErrorState;
 
 export type TFunction = (key: string) => string;
 

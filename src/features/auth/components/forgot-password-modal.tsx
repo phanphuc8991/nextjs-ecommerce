@@ -25,6 +25,7 @@ import { Controller, useForm } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
+  AUTH_ERROR_TYPES,
   createForgetPasswordStepOneSchema,
   createForgetPasswordStepTwoSchema,
   ForgetPasswordStepOneValues,
@@ -34,6 +35,7 @@ import { toFormData } from "@/lib/toFormData";
 import PasswordField from "@/components/PasswordField";
 import { forgotPassword } from "../actions";
 import { useGlobalTransition } from "@/hooks/useGlobalTransition";
+import { toast } from "sonner";
 
 const stepper = defineStepper(
   { id: "email", label: "step_login", icon: User },
@@ -87,9 +89,8 @@ export const ForgotPasswordlModal = ({
 
 const ResendContent = (props: any) => {
   const t = useTranslations("forgotPassword");
-
+  const { isLoading, handleResend, state } = useResendEmail();
   const methods = stepper.useStepper();
-  const [userId, setUserId] = useState("");
   const isComplete = methods.state.isLast;
   return (
     <div className="max-w-2xl mx-auto">
@@ -99,12 +100,17 @@ const ResendContent = (props: any) => {
           <AnimatePresence mode="wait">
             {methods.flow.when("email", () => (
               <motion.div key="step1" {...motionProps}>
-                <LoginStep setUserId={setUserId} t={t} methods={methods} />
+                <LoginStep
+                  handleResend={handleResend}
+                  isLoading={isLoading}
+                  t={t}
+                  methods={methods}
+                />
               </motion.div>
             ))}
             {methods.flow.when("verifyAndReset", () => (
               <motion.div key="step2" {...motionProps}>
-                <Verification userId={userId} methods={methods} t={t} />
+                <Verification state={state} methods={methods} t={t} />
               </motion.div>
             ))}
             {methods.flow.when("done", () => (
@@ -196,23 +202,21 @@ const ServerError = (error: any, t: any) => {
   if (!error?.type) return null;
   const renderError = () => {
     switch (error?.type) {
-      case "INVALID_CODE":
+      case AUTH_ERROR_TYPES.INVALID_CODE:
         return <span>{t("errors.invalidCode")}</span>;
-      case "CODE_EXPIRED":
+      case AUTH_ERROR_TYPES.CODE_EXPIRED:
         return <span>{t("errors.codeExpired")}</span>;
-      case "INVALID_EMAIL":
+      case AUTH_ERROR_TYPES.INVALID_EMAIL:
         return <span>{t("errors.invalidEmail")}</span>;
       default:
         return <span>{t("errors.unknown")}</span>;
     }
   };
-  return <div className="text-sm text-destructive mt-2">{renderError()}</div>;
+  return <div className="text-sm text-destructive mb-2">{renderError()}</div>;
 };
 
 const LoginStep = (props: any) => {
-  const { setUserId, t, methods } = props;
-  const { isLoading, handleResend, error, state } = useResendEmail();
-  console.log("isLoadingisLoadingisLoadingisLoading", isLoading);
+  const { state, t, methods, handleResend, isLoading} = props;
   const tValidation = useTranslations();
   const schema = createForgetPasswordStepOneSchema(tValidation);
   const form = useForm<ForgetPasswordStepOneValues>({
@@ -226,9 +230,15 @@ const LoginStep = (props: any) => {
     const email = data?.email;
     handleResend(email, methods.navigation.next);
   };
+
+  const sendEmailSuccess = () => {
+    toast.success("Code sent. Please check your email.", {
+      position: "top-center",
+    });
+  };
   useEffect(() => {
-    if (state?._id) {
-      setUserId(state?._id);
+    if (state?.success) {
+      sendEmailSuccess();
     }
   }, [state]);
 
@@ -268,14 +278,16 @@ const LoginStep = (props: any) => {
                 )}
               />
             </FieldGroup>
-            <div className="mt-6 flex justify-between">
-              {ServerError(error, t)}
-              <Button
-                type="submit"
-                className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
-              >
-                {isLoading ? t("buttons.loading") : t("buttons.sendCode")}
-              </Button>
+            <div className="mt-6 flex justify-end">
+              <div className="text-right">
+                {!state?.success && ServerError(state?.error, t)}
+                <Button
+                  type="submit"
+                  className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"
+                >
+                  {isLoading ? t("buttons.loading") : t("buttons.sendCode")}
+                </Button>
+              </div>
             </div>
           </form>
         </div>
@@ -285,14 +297,14 @@ const LoginStep = (props: any) => {
 };
 
 const Verification = (props: any) => {
-  const { methods, userId, t } = props;
+  const { methods, state: userInfo, t } = props;
   const tValidation = useTranslations();
   const schema = createForgetPasswordStepTwoSchema(tValidation);
   const { startTransition } = useGlobalTransition();
   const form = useForm<ForgetPasswordStepTwoValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      userId: userId,
+      userId: userInfo?.success && userInfo?._id,
       code: "",
       newPassword: "",
       confirmPassword: "",
@@ -302,7 +314,6 @@ const Verification = (props: any) => {
     control,
     handleSubmit,
     clearErrors,
-    formState: { errors },
   } = form;
   const [state, formAction, isPending] = useActionState(forgotPassword, null);
 
@@ -411,9 +422,9 @@ const Verification = (props: any) => {
             hideForgetPassWord={false}
           />
         </FieldGroup>
-        <div className="mt-6 flex justify-between">
-          <div>
-            {ServerError(state?.error, t)}
+        <div className="mt-6 flex justify-end">
+          <div className="text-right">
+            {!state?.success && ServerError(state?.error, t)}
             <Button
               type="submit"
               className="ml-auto px-4 py-2 text-sm font-medium rounded-lg text-white bg-indigo-9 hover:bg-indigo-10 hover:cursor-pointer transition-colors"

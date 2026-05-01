@@ -20,7 +20,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useTranslations } from "next-intl";
-import { createVerifyLoginSchema, VerifyLoginValues } from "../constants";
+import { AUTH_ERROR_TYPES, createVerifyLoginSchema, VerifyLoginValues } from "../constants";
 import { useActionState } from "react";
 import { toFormData } from "@/lib/toFormData";
 import { verify } from "../actions";
@@ -35,7 +35,7 @@ import { toast } from "sonner";
 
 export default function VerifyForm(props: any) {
   const locale = useLocale();
-  const { handleResend, error } = useResendEmail();
+  const { handleResend } = useResendEmail();
   const { startTransition } = useGlobalTransition();
   const { _id, email } = props;
   const t = useTranslations();
@@ -73,8 +73,8 @@ export default function VerifyForm(props: any) {
     if (!error) return null;
     const renderError = () => {
       switch (error.type) {
-        case "INVALID_ID":
-        case "INVALID_CODE":
+        case AUTH_ERROR_TYPES.INVALID_ID:
+        case AUTH_ERROR_TYPES.INVALID_CODE:
           return (
             <span>
               {t.rich("verify.errors.invalidId", {
@@ -91,7 +91,7 @@ export default function VerifyForm(props: any) {
               })}
             </span>
           );
-        case "INVALID_EMAIL":
+        case AUTH_ERROR_TYPES.INVALID_EMAIL:
           return (
             <span>
               {t.rich("verify.errors.invalidId", {
@@ -108,7 +108,7 @@ export default function VerifyForm(props: any) {
               })}
             </span>
           );
-        case "CODE_EXPIRED":
+        case AUTH_ERROR_TYPES.CODE_EXPIRED:
           return (
             <span>
               {t.rich("verify.errors.codeExpired", {
@@ -238,7 +238,7 @@ export default function VerifyForm(props: any) {
             </FieldGroup>
 
             <Field>
-              <ServerError error={state?.error || error} />
+              {!state?.success && <ServerError error={state?.error} />}
               <Button type="submit" className="w-full" disabled={isPending}>
                 {isPending
                   ? t("verify.buttons.loading")

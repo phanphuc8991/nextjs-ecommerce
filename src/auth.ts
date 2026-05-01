@@ -24,7 +24,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           password: credentials.password,
         });
         if (!res.success) {
-          throw new CustomAuthError("", res.raw.type, res.raw.message);
+          throw new CustomAuthError("", res.error.type, res.error.message);
         }
         return res as User;
       },
