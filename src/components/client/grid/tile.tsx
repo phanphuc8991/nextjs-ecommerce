@@ -3,7 +3,6 @@ import Image from "next/image";
 
 export default function GridTileImage(props: any) {
   const { src, alt, label } = props;
-
   return (
     <div className="relative group border rounded-lg hover:border-blue-600 bg-white h-full w-full overflow-hidden">
       <Image

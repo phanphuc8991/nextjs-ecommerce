@@ -8,11 +8,9 @@ export default function RootLayout({
 }>) {
   return (
     <>
-      <>
-        <NavBar />
-        {children}
-        <Footer />
-      </>
+      <NavBar />
+      {children}
+      <Footer />
     </>
   );
 }

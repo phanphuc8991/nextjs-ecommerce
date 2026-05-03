@@ -49,7 +49,6 @@ export default function Product() {
                   fill
                   alt=""
                   className="object-contain object-center"
-                  preload={true}
                 />
               </div>
               <div className="absolute w-full text-neutral-500 flex justify-center bottom-[15%]">

@@ -6,8 +6,8 @@ export default function VariantSelector(props: any) {
         <div key={`${item}-${index}`} className="mb-8">
           <h1 className="uppercase mb-3">{item.title}</h1>
           <ul className="flex gap-3 flex-wrap">
-            {item.item.map((text: any) => (
-              <li className="inline-block">
+            {item.item.map((text: any,index: number) => (
+              <li className="inline-block" key={index}>
                 {text !== "24M" ? (
                   <button className="ring-1 ring-transparent transition ease-in-out duration-300 hover:ring-blue-600 min-w-[48px] text-sm px-2 py-1 border rounded-full bg-neutral-100">
                     {text}
